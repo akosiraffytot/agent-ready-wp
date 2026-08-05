@@ -91,8 +91,17 @@ WordPress plugin "Agent Ready WP". Injects `@graph` JSON-LD for AI-agent readine
   `\YahnisElsts\PluginUpdateChecker\v5p7\PucFactory::buildUpdateChecker`
   with the hardcoded `ARWP_GITHUB_REPO` constant (no token; re-add a token
   field only for a private repo) + `setBranch( 'main' )` to match the repo's
-  default branch. Loader `file_exists()`-guards module requires. Update source
-  is the `main` branch — no GitHub Release/tag is required for updates.
+  default branch. Loader `file_exists()`-guards module requires. IMPORTANT
+  update mechanics: PUC detection priority = latest Release → highest-version
+  tag → `main` branch (`getUpdateDetectionStrategies()` GitHubApi.php:351-367).
+  A stale Release (the old `v1.0.0`) WINS over the branch and blocks updates —
+  that's exactly what happened for 1.0.2/1.0.3 until the `v1.0.3` GitHub
+  Release was published (a tag alone was NOT enough). Every functional version
+  needs its own GitHub Release. PUC's `fixDirectoryName` filter
+  (UpdateChecker.php:1045-1106) renames the version-suffixed zip folder
+  (`agent-ready-wp-1.0.3/`) back to `agent-ready-wp/` before install, so GitHub
+  zip folder names are update-safe. 1.0.3 update verified end-to-end on this
+  box: release published → WP detected → update installed successfully.
 - Phase 8 Windows caveat: WP's upgrader deletes the whole plugin folder before
   extracting. On Windows that delete can fail with "Could not remove the old
   plugin" if ANY process holds a handle on the folder (opencode's own working
@@ -106,7 +115,10 @@ WordPress plugin "Agent Ready WP". Injects `@graph` JSON-LD for AI-agent readine
   1.0.0). The broken 1.0.1 experiment was force-pushed away (`git push --force
   origin main`, `3c08f7a...c8d3746`) and exists only in the local reflog.
   **1.0.2** = commit `361dce0`. **1.0.3** (admin-bar Validate submenu +
-  readme.txt + header Description sync) = commit `0284834`.
+  readme.txt + header Description sync) = commit `0284834`. Post-release docs:
+  `6ba621d` (record 1.0.3 hash) + `01a3c84` (skills section). Tag `v1.0.3` and
+  GitHub Release `v1.0.3` published 2026-08-06; update detected + installed
+  end-to-end on this box.
   Committed files: plugin code + `AGENTS.md` + `readme.txt` + `CHANGELOG.TXT`.
   `TODO.MD` / `DEVELOPMENT_PLAN.md` / `recommended-fix-gemini.md` are
   `.gitignore`d local-only. WARNING: the destructive Phase 8 install test
@@ -131,6 +143,7 @@ WordPress plugin "Agent Ready WP". Injects `@graph` JSON-LD for AI-agent readine
 - SemVer: PATCH = bug fixes, MINOR = backwards-compatible features, MAJOR = breaking changes. Docs-only changes (readme.txt, plugin description, AGENTS.md, CHANGELOG.TXT) do NOT bump the version.
 - PUC offers an update only when the remote `Version:` header > installed version. A docs-only commit at the current version is correct — installed sites receive it with the next functional release.
 - Every functional release = ONE commit containing all of: `Version:` header bump + `ARWP_VERSION` bump (agent-ready-wp.php), new `readme.txt` changelog section + `Stable tag:` update, and `CHANGELOG.TXT` update. PUC reads the header from `main`, so keep version + notes in the same commit.
+- Every functional release ALSO needs a GitHub Release (`vN.N.N` tag + published Release). PUC priority = latest Release → highest-version tag → `main` branch, so an old Release on the repo blocks all newer tags/branch versions until a new Release is published.
 - `readme.txt` `Stable tag:` must always match the released code version.
 - Keep the plugin header `Description:` in sync with the readme short description (≤150 chars, no markup).
 - Push after any release commit; ask before running git commands.
