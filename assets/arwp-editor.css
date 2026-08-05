@@ -1,0 +1,34 @@
+/**
+ * Agent Ready WP — Post editor styles (JSON-LD meta box).
+ */
+.arwp-post-meta .arwp-faq-warning {
+	display: flex;
+	align-items: flex-start;
+	gap: 8px;
+	margin: 6px 0 0;
+	padding: 10px 12px;
+	background: #fcf0f1;
+	border-left: 4px solid #d63638;
+	border-radius: 2px;
+	color: #b32d2e;
+	font-weight: 600;
+}
+
+.arwp-post-meta .arwp-faq-warning::before {
+	content: "\f534";
+	font-family: dashicons;
+	font-size: 18px;
+	line-height: 1.4;
+	color: #d63638;
+}
+
+.arwp-author-note {
+	padding: 8px 0;
+	margin: 0 0 14px;
+	font-size: 13px;
+	line-height: 1.5;
+}
+
+.arwp-author-note a {
+	text-decoration: none;
+}
