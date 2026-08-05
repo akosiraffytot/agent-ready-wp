@@ -2,6 +2,11 @@
 
 WordPress plugin "Agent Ready WP". Injects `@graph` JSON-LD for AI-agent readiness. Zero runtime deps.
 
+## Skills (load every session)
+
+- **ALWAYS load the `wordpress-pro` skill first** (via the skill tool) at the start of every session before doing any work. It is the authoritative WordPress coding-standards + security reference for this project and must be loaded on every session.
+- `caveman` / `ponytail` output-style skills: **load every session too** (user prefers them active) — caveman = terse speech, ponytail = minimal/simplest solutions.
+
 ## Build workflow (critical)
 
 - **One phase at a time.** Work is gated by `TODO.MD`. Never build ahead of the approved phase. Finish phase -> give exact test steps -> wait for user confirmation -> tick checkbox -> next phase.
