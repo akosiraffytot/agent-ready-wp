@@ -45,15 +45,27 @@ WordPress plugin "Agent Ready WP". Injects `@graph` JSON-LD for AI-agent readine
   names unchanged, so `get_option()` reads and stored data are unaffected.
 - Only the JSON-LD module file exists. llm_txt, ai_robots, woocommerce are
   disabled dashboard cards only. No placeholder module files.
-- Phase 8 (PUC auto-update) in progress: PUC v5.7 vendored into `lib/`,
-  wired via `\YahnisElsts\PluginUpdateChecker\v5p7\PucFactory::buildUpdateChecker`
+- Phase 8 (PUC auto-update) complete (user-confirmed end-to-end): PUC v5.7
+  vendored into `lib/`, wired via
+  `\YahnisElsts\PluginUpdateChecker\v5p7\PucFactory::buildUpdateChecker`
   with the hardcoded `ARWP_GITHUB_REPO` constant (no token; re-add a token
   field only for a private repo) + `setBranch( 'main' )` to match the repo's
-  default branch. Loader must `file_exists()` guard module requires.
-- Git repo: initialized and pushed to `github.com/akosiraffytot/agent-ready-wp`
-  (branch `main`, first commit `21a540b`). Only plugin code + `AGENTS.md` are
-  committed; `TODO.MD` / `DEVELOPMENT_PLAN.md` / `recommended-fix-gemini.md`
-  are `.gitignore`d local-only. Still ask before running git commands.
+  default branch. Loader `file_exists()`-guards module requires. Update source
+  is the `main` branch — no GitHub Release/tag is required for updates.
+- Phase 8 Windows caveat: WP's upgrader deletes the whole plugin folder before
+  extracting. On Windows that delete can fail with "Could not remove the old
+  plugin" if ANY process holds a handle on the folder (opencode's own working
+  directory, Explorer, VS Code, or Windows Defender real-time scan). Fix:
+  close all windows on the plugin folder and pause Defender real-time
+  protection (`Set-MpPreference -DisableRealtimeMonitoring $true`) before
+  updating. This is environmental, not a PUC/code bug. Detection, download,
+  and install were all proven on this box.
+- Git repo: pushed to `github.com/akosiraffytot/agent-ready-wp` (branch `main`,
+  commits `21a540b` initial + `6fb8f05` docs). Only plugin code + `AGENTS.md`
+  are committed; `TODO.MD` / `DEVELOPMENT_PLAN.md` / `recommended-fix-gemini.md`
+  are `.gitignore`d local-only. WARNING: the destructive Phase 8 install test
+  wiped those three local-only files and they were never committed, so they
+  are NOT recoverable from git. Still ask before running git commands.
 
 ## Stack constraints
 
