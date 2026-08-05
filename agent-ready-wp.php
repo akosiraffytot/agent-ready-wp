@@ -2,8 +2,8 @@
 /**
  * Plugin Name: Agent Ready WP
  * Plugin URI:  https://github.com/akosiraffytot/agent-ready-wp
- * Description: Zero-bloat modular engine for AI agent readiness.
- * Version:     1.0.2
+ * Description: Zero-bloat JSON-LD plugin that automatically emits a full Schema.org @graph on every page for search engines and AI agents.
+ * Version:     1.0.3
  * Author:      Rafael Mendoza
  * Author URI:	https://akosiraffytot.dev/
  * License:	GPL v2 or later
@@ -13,7 +13,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'ARWP_VERSION', '1.0.2' );
+define( 'ARWP_VERSION', '1.0.3' );
 define( 'ARWP_PATH', plugin_dir_path( __FILE__ ) );
 define( 'ARWP_URL', plugin_dir_url( __FILE__ ) );
 define( 'ARWP_GITHUB_REPO', 'akosiraffytot/agent-ready-wp' );

@@ -77,7 +77,7 @@ function arwp_field_adminbar_validate() {
 		<?php esc_html_e( 'Show the "Validate Schema" button on the front-end admin bar.', 'arwp' ); ?>
 	</label>
 	<?php
-	arwp_field_description( __( 'When enabled, admins get a "Validate Schema" link in the top admin bar on pages, posts, and the homepage that opens schema.org\'s validator with the page\'s JSON-LD prefilled.', 'arwp' ) );
+	arwp_field_description( __( 'When enabled, admins get a "Validate Schema" item in the top admin bar on pages, posts, and the homepage that opens schema.org\'s validator with the page\'s JSON-LD prefilled. Hover it for a submenu with two URL-based validators: Schema.org (via URL) and Google\'s Rich Results Test.', 'arwp' ) );
 }
 
 /**

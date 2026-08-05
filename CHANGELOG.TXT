@@ -1,5 +1,8 @@
 === Agent Ready WP Changelog ===
 
+= 1.0.3 =
+* New: the admin bar "Validate Schema" menu now has a hover submenu with two URL-based validators — Schema.org (via URL) and Google's Rich Results Test — in addition to the existing code-prefilled schema.org validator. The URL-based links validate the live page (works only for publicly reachable URLs).
+
 = 1.0.2 =
 * Fixed: "Validate Schema" admin bar button now opens validator.schema.org with the prefilled JSON-LD even on sites with Formidable Forms active (the link is now built server-side, with no JavaScript dependency).
 * Fixed: the JSON-LD prefilled into the validator keeps its per-line formatting (newlines are no longer stripped by WordPress URL escaping).

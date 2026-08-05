@@ -669,13 +669,15 @@ function arwp_jsonld_render_output() {
 add_action( 'wp_head', 'arwp_jsonld_render_output', 5 );
 
 /**
- * Add a "Validate Schema" link to the admin bar that opens the current page's
- * schema in validator.schema.org (prefilled) in a new tab. The prefilled URL
- * is built server-side from the rendered @graph.
+ * Add a "Validate Schema" group to the admin bar. The main item opens the
+ * current page's schema in validator.schema.org (code-prefilled) in a new tab.
+ * A hover submenu offers two URL-based validators: schema.org's validator with
+ * the page URL (#url=) and Google's Rich Results Test (?url=).
  *
- * The node href is left empty so WP does not run the URL through esc_url()
- * (whose clean_url guard strips the %0A newlines); the link lives in the raw
- * title instead, so its href is escaped with esc_attr().
+ * The main item's href is left empty so WP does not run the URL through
+ * esc_url() (whose clean_url guard strips the %0A newlines); the link lives in
+ * the raw title instead, so its href is escaped with esc_attr(). The submenu
+ * hrefs are rawurlencode()d page URLs (no %0A) and pass esc_url() normally.
  *
  * @param WP_Admin_Bar $wp_admin_bar Admin bar object.
  */
@@ -715,6 +717,36 @@ function arwp_adminbar_validate_schema( $wp_admin_bar ) {
 			'id'    => 'arwp-validate-schema',
 			'title' => $title,
 			'href'  => '',
+		)
+	);
+
+	// add_query_arg() returns a relative URL; home_url() makes it absolute so
+	// the validators can fetch the page server-side.
+	$page_url = rawurlencode( home_url( add_query_arg( array() ) ) );
+
+	$wp_admin_bar->add_node(
+		array(
+			'id'     => 'arwp-validate-schema-schemaorg',
+			'parent' => 'arwp-validate-schema',
+			'title'  => esc_html__( 'Schema.org (via URL)', 'arwp' ),
+			'href'   => 'https://validator.schema.org/#url=' . $page_url,
+			'meta'   => array(
+				'target' => '_blank',
+				'rel'    => 'noopener noreferrer',
+			),
+		)
+	);
+
+	$wp_admin_bar->add_node(
+		array(
+			'id'     => 'arwp-validate-schema-richresults',
+			'parent' => 'arwp-validate-schema',
+			'title'  => esc_html__( "Google's Rich Results Test", 'arwp' ),
+			'href'   => 'https://search.google.com/test/rich-results?url=' . $page_url,
+			'meta'   => array(
+				'target' => '_blank',
+				'rel'    => 'noopener noreferrer',
+			),
 		)
 	);
 }

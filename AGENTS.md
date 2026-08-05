@@ -65,6 +65,20 @@ WordPress plugin "Agent Ready WP". Injects `@graph` JSON-LD for AI-agent readine
   choice: `validator.schema.org` (successor to Google SDTT). Its documented
   limitation ("will not fetch or interpret other @context URLs") does NOT apply
   — we always emit `@context: https://schema.org`, its built-in vocabulary.
+- Validate Schema (admin bar) submenu (1.0.3): the code-prefilled main item now
+  has a hover submenu with two URL-based validators — "Schema.org (via URL)"
+  (`https://validator.schema.org/#url=` + `rawurlencode( home_url( add_query_arg( array() ) ) )`)
+  and "Google's Rich Results Test"
+  (`https://search.google.com/test/rich-results?url=` + same). Both are native
+  admin-bar submenu nodes (`parent => 'arwp-validate-schema'`,
+  `target="_blank"`, `rel="noopener noreferrer"`); their hrefs are
+  rawurlencode'd page URLs (no `%0A`) so they pass `esc_url()` normally — no
+  title-anchor hack needed. The main item's server-side `?code=` prefill and
+  `assets/arwp-adminbar.css` are UNCHANGED. Both submenu links require a
+  publicly reachable URL — Google cannot fetch private/local domains
+  (`plugindev.test`), so on local/dev sites validation still goes through the
+  code-prefilled main item or the Settings-page Validate button (JS-built from
+  the live preview, admin-only).
 - Only the JSON-LD module file exists. llm_txt, ai_robots, woocommerce are
   disabled dashboard cards only. No placeholder module files.
 - Phase 8 (PUC auto-update) complete (user-confirmed end-to-end): PUC v5.7
@@ -86,11 +100,11 @@ WordPress plugin "Agent Ready WP". Injects `@graph` JSON-LD for AI-agent readine
   History: `21a540b` initial + `6fb8f05` docs + `c8d3746` docs (last sync point,
   1.0.0). The broken 1.0.1 experiment was force-pushed away (`git push --force
   origin main`, `3c08f7a...c8d3746`) and exists only in the local reflog.
-  **1.0.2 is CURRENTLY LOCAL-ONLY** — version header + `ARWP_VERSION` bumped,
-  admin-bar Validate fix + `AGENTS.md` updated, but NOT committed/pushed yet
-  (user commits + pushes on return). Only plugin code + `AGENTS.md` are
-  committed; `TODO.MD` / `DEVELOPMENT_PLAN.md` / `recommended-fix-gemini.md`
-  are `.gitignore`d local-only. WARNING: the destructive Phase 8 install test
+  **1.0.2** = commit `361dce0`. **1.0.3** (admin-bar Validate submenu +
+  readme.txt + header Description sync) = commit `&lt;hash&gt;`.
+  Committed files: plugin code + `AGENTS.md` + `readme.txt` + `CHANGELOG.TXT`.
+  `TODO.MD` / `DEVELOPMENT_PLAN.md` / `recommended-fix-gemini.md` are
+  `.gitignore`d local-only. WARNING: the destructive Phase 8 install test
   wiped those three local-only files and they were never committed, so they
   are NOT recoverable from git. Still ask before running git commands.
 
@@ -106,3 +120,13 @@ WordPress plugin "Agent Ready WP". Injects `@graph` JSON-LD for AI-agent readine
 - Lint: `php -l <file>` (PHP 8.3 CLI available on this Laragon box). Run after every phase.
 - PHPCS with `WordPress` standard if available; manual nonce/capability audit otherwise.
 - No automated test framework. User manually tests in `plugindev` WP install; you must supply concrete test steps per phase.
+
+## Versioning & releases
+
+- SemVer: PATCH = bug fixes, MINOR = backwards-compatible features, MAJOR = breaking changes. Docs-only changes (readme.txt, plugin description, AGENTS.md, CHANGELOG.TXT) do NOT bump the version.
+- PUC offers an update only when the remote `Version:` header > installed version. A docs-only commit at the current version is correct — installed sites receive it with the next functional release.
+- Every functional release = ONE commit containing all of: `Version:` header bump + `ARWP_VERSION` bump (agent-ready-wp.php), new `readme.txt` changelog section + `Stable tag:` update, and `CHANGELOG.TXT` update. PUC reads the header from `main`, so keep version + notes in the same commit.
+- `readme.txt` `Stable tag:` must always match the released code version.
+- Keep the plugin header `Description:` in sync with the readme short description (≤150 chars, no markup).
+- Push after any release commit; ask before running git commands.
+- Current released version: 1.0.3 (commit `<hash>`). Next: bug fix → 1.0.4, feature → 1.1.0.
