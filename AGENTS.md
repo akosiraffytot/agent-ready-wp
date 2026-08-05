@@ -45,17 +45,21 @@ WordPress plugin "Agent Ready WP". Injects `@graph` JSON-LD for AI-agent readine
   names unchanged, so `get_option()` reads and stored data are unaffected.
 - Only the JSON-LD module file exists. llm_txt, ai_robots, woocommerce are
   disabled dashboard cards only. No placeholder module files.
-- Phase 8 (PUC auto-update) in progress: re-download into `lib/`, wire
-  `PucFactory::buildUpdateChecker` with the hardcoded `ARWP_GITHUB_REPO`
-  constant (no token; re-add a token field only for a private repo). Loader
-  must `file_exists()` guard module requires.
-- Not a git repo. Don't run git/commit commands without asking.
+- Phase 8 (PUC auto-update) in progress: PUC v5.7 vendored into `lib/`,
+  wired via `\YahnisElsts\PluginUpdateChecker\v5p7\PucFactory::buildUpdateChecker`
+  with the hardcoded `ARWP_GITHUB_REPO` constant (no token; re-add a token
+  field only for a private repo) + `setBranch( 'main' )` to match the repo's
+  default branch. Loader must `file_exists()` guard module requires.
+- Git repo: initialized and pushed to `github.com/akosiraffytot/agent-ready-wp`
+  (branch `main`, first commit `21a540b`). Only plugin code + `AGENTS.md` are
+  committed; `TODO.MD` / `DEVELOPMENT_PLAN.md` / `recommended-fix-gemini.md`
+  are `.gitignore`d local-only. Still ask before running git commands.
 
 ## Stack constraints
 
 - WP 6.9+, PHP 7.4 floor — no PHP 8-only syntax (`match`, union types, `str_contains` without fallback).
 - WPCS: nonce on every form/AJAX, `sanitize_*` on input, `esc_*` on output, `current_user_can( 'manage_options' )` for admin/AJAX, `$wpdb->prepare` for SQL, i18n textdomain `arwp`, no `$_POST` without `wp_unslash` + sanitize.
-- JSON-LD output: single `<script type="application/ld+json">` on `wp_head` priority 5, via `wp_json_encode( $schema, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT )`. Never concatenate raw JSON strings.
+- JSON-LD output: single `<script type="application/ld+json">` on `wp_head` priority 5, via `wp_json_encode( $schema, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP )`. Never concatenate raw JSON strings.
 - No `ACF`/`WooCommerce` calls outside `function_exists()` / `class_exists()` guards.
 
 ## Verification
