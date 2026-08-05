@@ -101,7 +101,7 @@ WordPress plugin "Agent Ready WP". Injects `@graph` JSON-LD for AI-agent readine
   1.0.0). The broken 1.0.1 experiment was force-pushed away (`git push --force
   origin main`, `3c08f7a...c8d3746`) and exists only in the local reflog.
   **1.0.2** = commit `361dce0`. **1.0.3** (admin-bar Validate submenu +
-  readme.txt + header Description sync) = commit `&lt;hash&gt;`.
+  readme.txt + header Description sync) = commit `0284834`.
   Committed files: plugin code + `AGENTS.md` + `readme.txt` + `CHANGELOG.TXT`.
   `TODO.MD` / `DEVELOPMENT_PLAN.md` / `recommended-fix-gemini.md` are
   `.gitignore`d local-only. WARNING: the destructive Phase 8 install test
@@ -129,4 +129,4 @@ WordPress plugin "Agent Ready WP". Injects `@graph` JSON-LD for AI-agent readine
 - `readme.txt` `Stable tag:` must always match the released code version.
 - Keep the plugin header `Description:` in sync with the readme short description (≤150 chars, no markup).
 - Push after any release commit; ask before running git commands.
-- Current released version: 1.0.3 (commit `<hash>`). Next: bug fix → 1.0.4, feature → 1.1.0.
+- Current released version: 1.0.3 (commit `0284834`). Next: bug fix → 1.0.4, feature → 1.1.0.
