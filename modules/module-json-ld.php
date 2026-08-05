@@ -635,6 +635,20 @@ function arwp_jsonld_graph_json( $schema ) {
 }
 
 /**
+ * Build the validator.schema.org prefill URL for a schema array.
+ *
+ * The JSON is percent-encoded so pretty-print newlines survive as %0A. The
+ * URL is escaped with esc_attr() at output, never esc_url(), whose clean_url
+ * guard strips %0A/%0D sequences.
+ *
+ * @param array $schema Schema array.
+ * @return string
+ */
+function arwp_jsonld_validator_href( $schema ) {
+	return 'https://validator.schema.org/?code=' . rawurlencode( arwp_jsonld_graph_json( $schema ) );
+}
+
+/**
  * Output the @graph as a single ld+json script on wp_head (priority 5).
  */
 function arwp_jsonld_render_output() {
@@ -656,8 +670,12 @@ add_action( 'wp_head', 'arwp_jsonld_render_output', 5 );
 
 /**
  * Add a "Validate Schema" link to the admin bar that opens the current page's
- * schema in validator.schema.org (prefilled) in a new tab. The prefilled URL is
- * built client-side in arwp-validate-schema.js, mirroring the settings page.
+ * schema in validator.schema.org (prefilled) in a new tab. The prefilled URL
+ * is built server-side from the rendered @graph.
+ *
+ * The node href is left empty so WP does not run the URL through esc_url()
+ * (whose clean_url guard strips the %0A newlines); the link lives in the raw
+ * title instead, so its href is escaped with esc_attr().
  *
  * @param WP_Admin_Bar $wp_admin_bar Admin bar object.
  */
@@ -684,22 +702,26 @@ function arwp_adminbar_validate_schema( $wp_admin_bar ) {
 		return;
 	}
 
+	$schema = arwp_jsonld_build_graph();
+
+	if ( empty( $schema['@graph'] ) ) {
+		return;
+	}
+
+	$title = '<a href="' . esc_attr( arwp_jsonld_validator_href( $schema ) ) . '" target="_blank" rel="noopener noreferrer"><span class="ab-icon dashicons-schema"></span><span class="ab-label">' . esc_html__( 'Validate Schema', 'arwp' ) . '</span></a>';
+
 	$wp_admin_bar->add_node(
 		array(
 			'id'    => 'arwp-validate-schema',
-			'title' => '<span class="ab-icon dashicons-schema"></span><span class="ab-label">' . esc_html__( 'Validate Schema', 'arwp' ) . '</span>',
-			'href'  => 'https://validator.schema.org/',
-			'meta'  => array(
-				'target' => '_blank',
-				'rel'    => 'noopener noreferrer',
-			),
+			'title' => $title,
+			'href'  => '',
 		)
 	);
 }
 add_action( 'admin_bar_menu', 'arwp_adminbar_validate_schema', 100 );
 
 /**
- * Enqueue the admin bar validate script when the button will be shown.
+ * Enqueue the admin bar validate styles when the button will be shown.
  */
 function arwp_adminbar_assets() {
 	if ( ! is_admin_bar_showing() || is_admin() ) {
@@ -724,7 +746,7 @@ function arwp_adminbar_assets() {
 		return;
 	}
 
-	wp_enqueue_script( 'arwp-validate-schema', ARWP_URL . 'assets/arwp-validate-schema.js', array(), ARWP_VERSION, true );
+	wp_enqueue_style( 'arwp-adminbar', ARWP_URL . 'assets/arwp-adminbar.css', array(), ARWP_VERSION );
 }
 add_action( 'wp_enqueue_scripts', 'arwp_adminbar_assets' );
 

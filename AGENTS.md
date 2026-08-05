@@ -20,7 +20,7 @@ WordPress plugin "Agent Ready WP". Injects `@graph` JSON-LD for AI-agent readine
   `modules/module-json-ld.php` (per-module settings + live preview AJAX +
   `wp_head` @graph output), `assets/arwp-admin.css`,
   `assets/arwp-editor.css`, `assets/arwp-admin.js`,
-  `assets/arwp-jsonld-preview.js`.
+  `assets/arwp-jsonld-preview.js`, `assets/arwp-adminbar.css`.
 - Front-end output (Phase 4): single `ld+json` on `wp_head` priority 5 with
   @graph of Organization, WebSite, Person (single posts), and a content node.
   All entity refs are typed via `arwp_jsonld_ref()`. Static front page always
@@ -43,6 +43,28 @@ WordPress plugin "Agent Ready WP". Injects `@graph` JSON-LD for AI-agent readine
   their own group `arwp_jsonld_options` (`register_setting` +
   `settings_fields`); general Settings keeps `arwp_schema_options`. Option
   names unchanged, so `get_option()` reads and stored data are unaffected.
+- Validate Schema (admin bar): current **1.0.2** builds the prefilled
+  `validator.schema.org/?code=` link SERVER-SIDE with NO JS. The node `href` is
+  left `''` so WP never runs the URL through `esc_url()` (its `clean_url` CRLF
+  guard strips `%0A`/`%0d`/`%0a`/`%0D` — that was the 1.0.1 one-long-line bug).
+  The link lives in the raw `title` as an `<a href="esc_attr( ... )">` where the
+  URL comes from `arwp_jsonld_validator_href()` (`'https://validator.schema.org/?code=' .
+  rawurlencode( arwp_jsonld_graph_json( $schema ) )`); `esc_attr` does NOT run
+  `clean_url`, so pretty-print newlines survive as `%0A`. 1.0.0's
+  `arwp-validate-schema.js` (click-time `window.open` interception) was DELETED
+  because it silently failed to attach when the footer script ran before the
+  admin bar rendered — e.g. with Formidable Forms active
+  (`FrmFormsController::footer_js` on `wp_footer` p1, `move_menu_to_footer()`
+  removes the `wp_body_open` renderer, `wp_before_admin_bar_render` hook) — and
+  the bare href was followed. Server-side anchor is immune to JS/footer
+  ordering. Empty-href nodes render `<div class="ab-item ab-empty-item">`;
+  `assets/arwp-adminbar.css` (enqueued by `arwp_adminbar_assets()`) styles the
+  inner anchor (inherits admin-bar color; core `li:hover > .ab-item` hover).
+  The admin Settings-page Validate button is UNCHANGED (JS-built from the live
+  preview via `arwp-jsonld-preview.js`, admin-only, not affected). Validator
+  choice: `validator.schema.org` (successor to Google SDTT). Its documented
+  limitation ("will not fetch or interpret other @context URLs") does NOT apply
+  — we always emit `@context: https://schema.org`, its built-in vocabulary.
 - Only the JSON-LD module file exists. llm_txt, ai_robots, woocommerce are
   disabled dashboard cards only. No placeholder module files.
 - Phase 8 (PUC auto-update) complete (user-confirmed end-to-end): PUC v5.7
@@ -60,9 +82,14 @@ WordPress plugin "Agent Ready WP". Injects `@graph` JSON-LD for AI-agent readine
   protection (`Set-MpPreference -DisableRealtimeMonitoring $true`) before
   updating. This is environmental, not a PUC/code bug. Detection, download,
   and install were all proven on this box.
-- Git repo: pushed to `github.com/akosiraffytot/agent-ready-wp` (branch `main`,
-  commits `21a540b` initial + `6fb8f05` docs). Only plugin code + `AGENTS.md`
-  are committed; `TODO.MD` / `DEVELOPMENT_PLAN.md` / `recommended-fix-gemini.md`
+- Git repo: pushed to `github.com/akosiraffytot/agent-ready-wp` (branch `main`).
+  History: `21a540b` initial + `6fb8f05` docs + `c8d3746` docs (last sync point,
+  1.0.0). The broken 1.0.1 experiment was force-pushed away (`git push --force
+  origin main`, `3c08f7a...c8d3746`) and exists only in the local reflog.
+  **1.0.2 is CURRENTLY LOCAL-ONLY** — version header + `ARWP_VERSION` bumped,
+  admin-bar Validate fix + `AGENTS.md` updated, but NOT committed/pushed yet
+  (user commits + pushes on return). Only plugin code + `AGENTS.md` are
+  committed; `TODO.MD` / `DEVELOPMENT_PLAN.md` / `recommended-fix-gemini.md`
   are `.gitignore`d local-only. WARNING: the destructive Phase 8 install test
   wiped those three local-only files and they were never committed, so they
   are NOT recoverable from git. Still ask before running git commands.

@@ -1,0 +1,12 @@
+#wpadminbar #wp-admin-bar-arwp-validate-schema .ab-empty-item {
+	padding: 0;
+}
+
+#wpadminbar #wp-admin-bar-arwp-validate-schema a {
+	color: inherit;
+}
+
+#wpadminbar #wp-admin-bar-arwp-validate-schema a:hover,
+#wpadminbar #wp-admin-bar-arwp-validate-schema a:focus {
+	color: #72aee6;
+}

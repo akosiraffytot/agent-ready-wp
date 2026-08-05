@@ -1,0 +1,14 @@
+=== Agent Ready WP Changelog ===
+
+= 1.0.2 =
+* Fixed: "Validate Schema" admin bar button now opens validator.schema.org with the prefilled JSON-LD even on sites with Formidable Forms active (the link is now built server-side, with no JavaScript dependency).
+* Fixed: the JSON-LD prefilled into the validator keeps its per-line formatting (newlines are no longer stripped by WordPress URL escaping).
+
+= 1.0.0 =
+* Initial release.
+* Emits a single JSON-LD @graph for AI-agent readiness: Organization, WebSite, Person (single posts), content nodes, archives/home CollectionPage + ItemList, and custom post type support.
+* Dashboard with one-click module toggles (JSON-LD active; llm_txt, ai_robots, woocommerce coming soon).
+* Post/page schema overrides (WebPage, AboutPage, ContactPage, FAQPage) with FAQ validation.
+* Author profile fields (jobTitle, sameAs) for Person schema.
+* Live JSON-LD preview with Copy and Validate actions on the settings page.
+* Automatic updates from GitHub (Plugin Update Checker).
