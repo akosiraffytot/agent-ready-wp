@@ -1,0 +1,29 @@
+name: Build install-ready zip
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Stage plugin files
+        run: |
+          mkdir -p staging/agent-ready-wp
+          cp -r agent-ready-wp.php inc modules assets lib readme.txt CHANGELOG.TXT staging/agent-ready-wp/
+
+      - name: Create clean zip
+        run: |
+          cd staging
+          zip -r ../agent-ready-wp.zip agent-ready-wp
+
+      - name: Upload to release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release upload "${{ github.event.release.tag_name }}" agent-ready-wp.zip --clobber
