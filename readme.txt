@@ -3,7 +3,7 @@ Contributors: akosiraffytot
 Tags: json-ld, schema, structured data, schema.org, seo, knowledge graph
 Requires at least: 6.9
 Tested up to: 7.0.2
-Stable tag: 1.0.3
+Stable tag: 1.0.4
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -67,6 +67,9 @@ No. Output is a single small JSON-LD script in the head, built with standard Wor
 
 == Changelog ==
 
+= 1.0.4 =
+* Updated: plugin updates now download the install-ready zip attached to the GitHub release, so the plugin folder stays free of repository-only files (index.html, .github, AGENTS.md).
+
 = 1.0.3 =
 * New: the admin bar "Validate Schema" menu now includes a submenu with two URL-based validators — Schema.org (via URL) and Google's Rich Results Test — alongside the existing code-prefilled schema.org validator.
 
@@ -84,6 +87,9 @@ No. Output is a single small JSON-LD script in the head, built with standard Wor
 * Automatic updates from GitHub (Plugin Update Checker).
 
 == Upgrade Notice ==
+
+= 1.0.4 =
+Updates now use the clean install-ready zip from the release; the plugin folder no longer gains repository files during an update.
 
 = 1.0.3 =
 Adds URL-based validation links (Schema.org via URL and Google's Rich Results Test) to the admin bar Validate Schema menu.

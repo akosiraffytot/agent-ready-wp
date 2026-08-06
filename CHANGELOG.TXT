@@ -1,5 +1,8 @@
 === Agent Ready WP Changelog ===
 
+= 1.0.4 =
+* Updated: plugin updates now download the install-ready zip attached to the GitHub release, so the plugin folder stays free of repository-only files (index.html, .github, AGENTS.md).
+
 = 1.0.3 =
 * New: the admin bar "Validate Schema" menu now has a hover submenu with two URL-based validators — Schema.org (via URL) and Google's Rich Results Test — in addition to the existing code-prefilled schema.org validator. The URL-based links validate the live page (works only for publicly reachable URLs).
 
