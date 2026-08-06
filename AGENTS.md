@@ -102,6 +102,13 @@ WordPress plugin "Agent Ready WP". Injects `@graph` JSON-LD for AI-agent readine
   (`agent-ready-wp-1.0.3/`) back to `agent-ready-wp/` before install, so GitHub
   zip folder names are update-safe. 1.0.3 update verified end-to-end on this
   box: release published → WP detected → update installed successfully.
+  Since 1.0.4 PUC also calls `getVcsApi()->enableReleaseAssets( '/\.zip($|[?#])/i' )`
+  (agent-ready-wp.php) so updates download the clean release asset
+  `agent-ready-wp.zip` instead of GitHub's auto source archive — the plugin
+  folder stays free of repo-only files (index.html, .github, AGENTS.md,
+  .gitignore, .nojekyll). PUC only sees API-listed assets (user-uploaded; the
+  auto "Source code (zip)" is not among them), and falls back to the source
+  archive if a Release lacks a matching asset (GitHubApi.php:100-135).
 - Phase 8 Windows caveat: WP's upgrader deletes the whole plugin folder before
   extracting. On Windows that delete can fail with "Could not remove the old
   plugin" if ANY process holds a handle on the folder (opencode's own working
@@ -118,7 +125,12 @@ WordPress plugin "Agent Ready WP". Injects `@graph` JSON-LD for AI-agent readine
   readme.txt + header Description sync) = commit `0284834`. Post-release docs:
   `6ba621d` (record 1.0.3 hash) + `01a3c84` (skills section). Tag `v1.0.3` and
   GitHub Release `v1.0.3` published 2026-08-06; update detected + installed
-  end-to-end on this box.
+  end-to-end on this box. 1.0.4 (enableReleaseAssets) = commit `5fc1410`.
+  LESSON (1.0.3 release re-create): the original `v1.0.3` tag pointed at
+  `01a3c84`, which predates `.github/workflows/` — a `release: published`
+  event resolves the workflow from the RELEASE'S COMMIT TREE, not main HEAD,
+  so it found no workflow and attached no asset. Always create the release
+  tag on a commit that contains the workflow file.
   Committed files: plugin code + `AGENTS.md` + `readme.txt` + `CHANGELOG.TXT`.
   `TODO.MD` / `DEVELOPMENT_PLAN.md` / `recommended-fix-gemini.md` are
   `.gitignore`d local-only. WARNING: the destructive Phase 8 install test
@@ -148,4 +160,4 @@ WordPress plugin "Agent Ready WP". Injects `@graph` JSON-LD for AI-agent readine
 - `readme.txt` `Stable tag:` must always match the released code version.
 - Keep the plugin header `Description:` in sync with the readme short description (≤150 chars, no markup).
 - Push after any release commit; ask before running git commands.
-- Current released version: 1.0.3 (commit `0284834`). Next: bug fix → 1.0.4, feature → 1.1.0.
+- Current released version: 1.0.4 (commit `5fc1410`). Next: bug fix → 1.0.5, feature → 1.1.0.
