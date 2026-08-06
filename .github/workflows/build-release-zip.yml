@@ -16,7 +16,12 @@ jobs:
       - name: Stage plugin files
         run: |
           mkdir -p staging/agent-ready-wp
-          cp -r agent-ready-wp.php inc modules assets lib readme.txt CHANGELOG.TXT staging/agent-ready-wp/
+          rsync -a \
+            --exclude='.git' --exclude='.github' --exclude='.gitignore' \
+            --exclude='AGENTS.md' --exclude='index.html' --exclude='.nojekyll' \
+            --exclude='TODO.MD' --exclude='DEVELOPMENT_PLAN.md' --exclude='recommended-fix-gemini.md' \
+            --exclude='staging' \
+            ./ staging/agent-ready-wp/
 
       - name: Create clean zip
         run: |
