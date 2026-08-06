@@ -109,6 +109,13 @@ WordPress plugin "Agent Ready WP". Injects `@graph` JSON-LD for AI-agent readine
   .gitignore, .nojekyll). PUC only sees API-listed assets (user-uploaded; the
   auto "Source code (zip)" is not among them), and falls back to the source
   archive if a Release lacks a matching asset (GitHubApi.php:100-135).
+  GOTCHA (1.0.3→1.0.4, live): the update IMMEDIATELY after enabling release
+  assets STILL ships repo files, because the download is performed by the
+  PREVIOUSLY-INSTALLED version's PUC code (1.0.3 lacked the flag, so it fetched
+  the source archive). Clean updates only start with the NEXT hop — when the
+  installed version that performs the download already has the flag. Don't
+  diagnose this as a PUC/CI bug; it self-heals (WP's upgrader deletes the whole
+  plugin folder before extracting the clean asset).
 - Phase 8 Windows caveat: WP's upgrader deletes the whole plugin folder before
   extracting. On Windows that delete can fail with "Could not remove the old
   plugin" if ANY process holds a handle on the folder (opencode's own working
@@ -126,6 +133,11 @@ WordPress plugin "Agent Ready WP". Injects `@graph` JSON-LD for AI-agent readine
   `6ba621d` (record 1.0.3 hash) + `01a3c84` (skills section). Tag `v1.0.3` and
   GitHub Release `v1.0.3` published 2026-08-06; update detected + installed
   end-to-end on this box. 1.0.4 (enableReleaseAssets) = commit `5fc1410`.
+  Post-release docs: `deb3436` (1.0.4 hash + release-tag lesson) + `5585e84`
+  (CI rsync blacklist). Tag `v1.0.4` + GitHub Release `v1.0.4` published
+  2026-08-06; the workflow auto-attached the clean `agent-ready-wp.zip`
+  (asset present, ~197 KB). The 1.0.3→1.0.4 hop on two live sites shipped the
+  5 repo-only files (see the GOTCHA above) — expected, self-heals at 1.0.5.
   LESSON (1.0.3 release re-create): the original `v1.0.3` tag pointed at
   `01a3c84`, which predates `.github/workflows/` — a `release: published`
   event resolves the workflow from the RELEASE'S COMMIT TREE, not main HEAD,
@@ -156,7 +168,7 @@ WordPress plugin "Agent Ready WP". Injects `@graph` JSON-LD for AI-agent readine
 - PUC offers an update only when the remote `Version:` header > installed version. A docs-only commit at the current version is correct — installed sites receive it with the next functional release.
 - Every functional release = ONE commit containing all of: `Version:` header bump + `ARWP_VERSION` bump (agent-ready-wp.php), new `readme.txt` changelog section + `Stable tag:` update, and `CHANGELOG.TXT` update. PUC reads the header from `main`, so keep version + notes in the same commit.
 - Every functional release ALSO needs a GitHub Release (`vN.N.N` tag + published Release). PUC priority = latest Release → highest-version tag → `main` branch, so an old Release on the repo blocks all newer tags/branch versions until a new Release is published.
-- Publishing a Release auto-runs `.github/workflows/build-release-zip.yml`, which zips only the install files (`agent-ready-wp.php`, `inc/`, `modules/`, `assets/`, `lib/`, `readme.txt`, `CHANGELOG.TXT`) into an `agent-ready-wp/` root folder and uploads `agent-ready-wp.zip` to that Release as an asset. The site at `akosiraffytot.github.io/agent-ready-wp` (GitHub Pages, source = `main` root, `index.html` + `.nojekyll`) has a Download button pointing at `releases/latest/download/agent-ready-wp.zip` (permanent latest-asset URL). If a Release has no `agent-ready-wp.zip` asset, that URL 404s — keep the asset attached on every functional release. Re-publishing a Release re-triggers the workflow (`--clobber` overwrites the asset).
+- Publishing a Release auto-runs `.github/workflows/build-release-zip.yml`, which `rsync`s the repo root into an `agent-ready-wp/` staging folder EXCLUDING a blacklist (`.git`, `.github`, `.gitignore`, `AGENTS.md`, `index.html`, `.nojekyll`, dev-only `TODO.MD`/`DEVELOPMENT_PLAN.md`/`recommended-fix-gemini.md`, `staging`), zips it, and uploads `agent-ready-wp.zip` to that Release as an asset (since commit `5585e84`). New plugin files/dirs at the repo root are auto-included; a NEW repo-only root file requires adding it to the exclude list. The site at `akosiraffytot.github.io/agent-ready-wp` (GitHub Pages, source = `main` root, `index.html` + `.nojekyll`) has a Download button pointing at `releases/latest/download/agent-ready-wp.zip` (permanent latest-asset URL). If a Release has no `agent-ready-wp.zip` asset, that URL 404s — keep the asset attached on every functional release. Re-publishing a Release re-triggers the workflow (`--clobber` overwrites the asset).
 - `readme.txt` `Stable tag:` must always match the released code version.
 - Keep the plugin header `Description:` in sync with the readme short description (≤150 chars, no markup).
 - Push after any release commit; ask before running git commands.
