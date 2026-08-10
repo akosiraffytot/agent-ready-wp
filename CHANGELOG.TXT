@@ -1,5 +1,18 @@
 === Agent Ready WP Changelog ===
 
+= 1.1.0 =
+* New: organization type selector — 54 Schema.org subtypes (LocalBusiness/MedicalBusiness, non-profit, news media, corporation, online business, and store types) with conditional settings sections.
+* New: Organization identity fields: legalName, slogan, taxID, vatID, foundingDate, founder, areaServed, contactPoint (telephone, email, contactType, availableLanguage), sameAs, knowsAbout.
+* New: LocalBusiness data: PostalAddress, GeoCoordinates, priceRange, openingHoursSpecification (parsed from lines like "Mo-Fr 09:00-17:00").
+* New: niche fields: nonprofitStatus, publishingPrinciples/ethicsPolicy/correctionsPolicy/diversityPolicy, tickerSymbol, paymentAccepted/currenciesAccepted/hasMerchantReturnPolicy.
+* New: per-post Service schema (serviceType + offers/price) from the post editor.
+* New: automatic BreadcrumbList on pages (ancestors), posts (top-level category), and archives; skipped when fewer than 2 items.
+* New: "Disable Third-Party JSON-LD Schema" toggle suppresses Yoast/Rank Math/AIOSEO JSON-LD while the module is active.
+* New: developer filters agent_ready_organization_node (per-node) and agent_ready_json_ld_graph (full graph, incl. settings preview).
+* New: organization logo selectable from the WordPress Media Library.
+* Improved: validator `?code=` prefill now falls back to URL-based validation (`#url=`) when the encoded payload exceeds 14 KB instead of opening an empty validator.
+* Fixed: settings pages (general + JSON-LD) now render the "Settings saved." notice via settings_errors().
+
 = 1.0.4 =
 * Updated: plugin updates now download the install-ready zip attached to the GitHub release, so the plugin folder stays free of repository-only files (index.html, .github, AGENTS.md).
 

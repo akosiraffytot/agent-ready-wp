@@ -3,7 +3,7 @@ Contributors: akosiraffytot
 Tags: json-ld, schema, structured data, schema.org, seo, knowledge graph
 Requires at least: 6.9
 Tested up to: 7.0.2
-Stable tag: 1.0.4
+Stable tag: 1.1.0
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -67,6 +67,19 @@ No. Output is a single small JSON-LD script in the head, built with standard Wor
 
 == Changelog ==
 
+= 1.1.0 =
+* New: organization type selector with 54 Schema.org subtypes (LocalBusiness, non-profit, news media, corporation, e-commerce, and store types).
+* New: Organization identity fields — legal name, slogan, tax/VAT IDs, founding date, founder, area served, and contact point (phone, email, type, languages).
+* New: LocalBusiness data — postal address, geo coordinates, price range, and opening hours (parsed to openingHoursSpecification).
+* New: niche fields — non-profit status, publishing/ethics/corrections/diversity policies, ticker symbol, accepted payments/currencies, merchant return policy.
+* New: per-post Service schema (type + price) from the editor.
+* New: automatic BreadcrumbList on pages, posts, and archives.
+* New: option to suppress third-party SEO JSON-LD (Yoast, Rank Math, AIOSEO) to avoid duplicates.
+* New: developer filters agent_ready_organization_node and agent_ready_json_ld_graph.
+* New: organization logo pickable from the WordPress Media Library.
+* Improved: oversized validator code-prefill now falls back to URL-based validation instead of an empty validator.
+* Fixed: settings pages now show the "Settings saved." confirmation notice after saving.
+
 = 1.0.4 =
 * Updated: plugin updates now download the install-ready zip attached to the GitHub release, so the plugin folder stays free of repository-only files (index.html, .github, AGENTS.md).
 
@@ -87,6 +100,9 @@ No. Output is a single small JSON-LD script in the head, built with standard Wor
 * Automatic updates from GitHub (Plugin Update Checker).
 
 == Upgrade Notice ==
+
+= 1.1.0 =
+Adds the schema expansion: organization type selector, LocalBusiness/non-profit/news/corporate/e-commerce fields, Service schema, BreadcrumbList, third-party SEO suppression, developer filters, and Media Library logo picker.
 
 = 1.0.4 =
 Updates now use the clean install-ready zip from the release; the plugin folder no longer gains repository files during an update.

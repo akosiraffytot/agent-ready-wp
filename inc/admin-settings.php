@@ -27,6 +27,7 @@ add_action( 'admin_menu', 'arwp_register_settings_menu' );
  */
 function arwp_register_global_settings() {
 	register_setting( 'arwp_schema_options', 'arwp_adminbar_validate_schema', array( 'sanitize_callback' => 'arwp_sanitize_toggle' ) );
+	register_setting( 'arwp_schema_options', 'arwp_disable_third_party_schema', array( 'sanitize_callback' => 'arwp_sanitize_toggle' ) );
 
 	add_settings_section(
 		'arwp_general_section',
@@ -36,6 +37,8 @@ function arwp_register_global_settings() {
 	);
 
 	add_settings_field( 'arwp_adminbar_validate_schema', __( 'Validate Schema (Admin Bar)', 'arwp' ), 'arwp_field_adminbar_validate', 'arwp-settings', 'arwp_general_section' );
+
+	add_settings_field( 'arwp_disable_third_party_schema', __( 'Third-Party JSON-LD', 'arwp' ), 'arwp_field_seo_toggle', 'arwp-settings', 'arwp_general_section' );
 
 	add_settings_section(
 		'arwp_author_section',
@@ -81,6 +84,27 @@ function arwp_field_adminbar_validate() {
 }
 
 /**
+ * Render the "Disable third-party JSON-LD" toggle.
+ */
+function arwp_field_seo_toggle() {
+	$active  = get_option( 'arwp_schema_active_modules', arwp_get_default_modules() );
+	$enabled = ! empty( $active['json_ld'] );
+	$checked = get_option( 'arwp_disable_third_party_schema', 1 );
+	?>
+	<label for="arwp-disable-third-party-schema" class="<?php echo $enabled ? '' : 'arwp-field-muted'; ?>">
+		<input type="hidden" name="arwp_disable_third_party_schema" value="0">
+		<input type="checkbox" id="arwp-disable-third-party-schema" name="arwp_disable_third_party_schema" value="1" <?php checked( $checked, 1 ); ?>>
+		<?php esc_html_e( 'Suppress JSON-LD from Yoast SEO, Rank Math and All in One SEO.', 'arwp' ); ?>
+	</label>
+	<?php
+	arwp_field_description(
+		$enabled
+			? __( 'When enabled, the JSON-LD output of those plugins is disabled so only the Agent Ready WP graph is emitted. Meta-tag output (og:, twitter:, robots) is not affected.', 'arwp' )
+			: __( 'The JSON-LD Schema module is currently disabled on the Dashboard, so this setting has no effect until it is re-enabled.', 'arwp' )
+	);
+}
+
+/**
  * Render the "Author Schema" note with a link to the current user's profile.
  */
 function arwp_field_author_schema_note() {
@@ -100,6 +124,7 @@ function arwp_field_author_schema_note() {
 function arwp_render_settings() {
 	?>
 	<div class="wrap">
+		<?php settings_errors(); ?>
 		<h1><?php echo esc_html( get_admin_page_title() ); ?></h1>
 		<form action="options.php" method="post">
 			<?php
@@ -126,6 +151,28 @@ function arwp_sanitize_url_list( $value ) {
 		$url = esc_url_raw( trim( $line ) );
 		if ( '' !== $url ) {
 			$clean[] = $url;
+		}
+	}
+
+	return implode( "\n", $clean );
+}
+
+/**
+ * Sanitize a newline-separated list of plain text lines (may mix names and
+ * URLs, e.g. areaServed). Unlike arwp_sanitize_url_list, lines are NOT run
+ * through esc_url_raw, which would prepend http:// to scheme-less text.
+ *
+ * @param string $value Raw input.
+ * @return string
+ */
+function arwp_sanitize_text_list( $value ) {
+	$lines = preg_split( '/\r\n|\r|\n/', (string) $value );
+	$clean = array();
+
+	foreach ( $lines as $line ) {
+		$line = sanitize_text_field( trim( $line ) );
+		if ( '' !== $line ) {
+			$clean[] = $line;
 		}
 	}
 

@@ -54,6 +54,14 @@ function arwp_admin_enqueue( $hook_suffix ) {
 			(string) filemtime( ARWP_PATH . 'assets/arwp-editor.css' )
 		);
 
+		wp_enqueue_script(
+			'arwp-editor',
+			ARWP_URL . 'assets/arwp-editor.js',
+			array(),
+			(string) filemtime( ARWP_PATH . 'assets/arwp-editor.js' ),
+			true
+		);
+
 		return;
 	}
 
@@ -82,6 +90,8 @@ function arwp_admin_enqueue( $hook_suffix ) {
 	);
 
 	if ( 'agent-ready-wp_page_arwp-jsonld' === $hook_suffix ) {
+		wp_enqueue_media();
+
 		wp_enqueue_script(
 			'arwp-jsonld-preview',
 			ARWP_URL . 'assets/arwp-jsonld-preview.js',
@@ -96,6 +106,7 @@ function arwp_admin_enqueue( $hook_suffix ) {
 			array(
 				'ajaxUrl' => admin_url( 'admin-ajax.php' ),
 				'nonce'   => wp_create_nonce( 'arwp_preview_jsonld' ),
+				'pageUrl' => home_url( '/' ),
 			)
 		);
 	}

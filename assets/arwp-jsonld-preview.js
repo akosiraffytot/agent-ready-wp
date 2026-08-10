@@ -77,7 +77,10 @@
 
 	function updateValidateLink() {
 		if ( validateLink && currentJson ) {
-			validateLink.href = 'https://validator.schema.org/?code=' + encodeURIComponent( currentJson );
+			var url = 'https://validator.schema.org/?code=' + encodeURIComponent( currentJson );
+			validateLink.href = url.length > 14000
+				? 'https://validator.schema.org/#url=' + encodeURIComponent( ArwpPreview.pageUrl )
+				: url;
 		}
 	}
 

@@ -40,6 +40,56 @@ WordPress plugin "Agent Ready WP". Injects `@graph` JSON-LD for AI-agent readine
   (Phase 7). `inLanguage` follows `get_locale()` so multilingual sites are
   covered with no extra code. The "no author" Person-skip path is code-guarded
   via `post_author > 0` (not UI-testable).
+- 1.1.0 schema expansion: Phases 1–7 complete (all user-confirmed). Phase 6
+  (SEO-compat) behavior: option `arwp_disable_third_party_schema` on global
+  Settings (General section, hidden-0 checkbox) defaults ON, and suppression
+  only applies while the JSON-LD module is active — `arwp_disable_third_party_schema()`
+  (module-json-ld.php, `init`) gates on `arwp_schema_active_modules['json_ld']`
+  AND the option, then adds `wpseo_json_ld_output` (`__return_false`),
+  `rank_math/json_ld` (`__return_empty_array`; the old `rank_math/json_ld/level_0`
+  from the spec was a hallucinated no-op), `aioseo_schema_disable`
+  (`__return_true`). When the module is off the checkbox is visually greyed but
+  stays ENABLED so options.php (`update_option( $option, null )` for
+  non-POSTed group options) can't wipe the stored preference; the JSON-LD
+  sidebar submenu is hidden when off via a DOMContentLoaded-deferred head
+  script (`arwp_jsonld_hide_menu_when_off()`, module-json-ld.php — the original
+  script ran in `admin_head` before `#adminmenu` existed in the DOM and never
+  hid anything). Activation seeds `arwp_disable_third_party_schema = '1'`.
+  Live suppression vs a real SEO plugin NOT tested (none installed) — code-only
+  acceptance.
+- 1.1.0 Phase 7 (dev filters + logo picker + validator guard) complete, all
+  user-confirmed. Three additions to `modules/module-json-ld.php` +
+  `assets/arwp-admin.js` + `assets/arwp-jsonld-preview.js`:
+  - **Dev filters:** `apply_filters( 'agent_ready_organization_node', $organization )`
+    in `arwp_jsonld_build_global_nodes()` (covers front-end AND preview — preview
+    calls this function), and `apply_filters( 'agent_ready_json_ld_graph', $graph )`
+    on the return of `arwp_jsonld_build_graph()` (covers front-end, admin-bar
+    main item, submenu validators). The settings preview AJAX
+    (`arwp_ajax_preview_jsonld()`) builds its schema INLINE and now ALSO wraps it
+    in `agent_ready_json_ld_graph` so the preview can't diverge from live output.
+  - **Logo picker:** `arwp_field_org_logo()` uses custom markup (text input
+    `arwp_schema_org_logo` + "Select from Media Library" button) instead of
+    `arwp_text_field()`. `wp_enqueue_media()` added to the jsonld-page branch of
+    `arwp_admin_enqueue()`. The media-frame handler in `assets/arwp-admin.js` is
+    bound inside `window.addEventListener('load', ...)` because `arwp-admin.js`
+    (footer, enqueued before `wp_enqueue_media()`) otherwise runs before
+    `wp.media` exists — same footer-ordering fragility class as the old
+    Formidable/`arwp-validate-schema.js` bug.
+  - **Validator guard:** `arwp_jsonld_validator_href()` returns
+    `https://validator.schema.org/#url=` + rawurlencode( current page URL ) when
+    the `?code=` payload would exceed 14 KB (admin bar main item + its
+    title-anchor inherit automatically; submenu unchanged). Settings-page
+    Validate button (`updateValidateLink()` in `assets/arwp-jsonld-preview.js`)
+    falls back to `#url=` + `ArwpPreview.pageUrl` (`home_url('/')`, localized in
+    `admin-dashboard.php`) at the same threshold. Decision: `#url=` (URL fetch)
+    instead of the originally-planned bare validator URL — matches the existing
+    "Schema.org (via URL)" submenu behavior. `#url=` needs a publicly reachable
+    URL (fetch fails on `plugindev.test`, same as the submenu items).
+  - **FIX (found while testing):** neither settings page rendered
+    `settings_errors()`, so Save Changes silently reloaded with no "Settings
+    saved." notice. Added `settings_errors();` after the opening `<div class="wrap">`
+    in both `arwp_render_settings()` (admin-settings.php) and
+    `arwp_jsonld_render_settings()` (module-json-ld.php). Folds into 1.1.0.
 - FIX (post-Phase-7): the Settings (general) and JSON-LD settings pages shared
   the option group `arwp_schema_options`, and WP `options.php` calls
   `update_option( $option, null )` for every non-POSTed option in the group —
@@ -168,8 +218,25 @@ WordPress plugin "Agent Ready WP". Injects `@graph` JSON-LD for AI-agent readine
 - PUC offers an update only when the remote `Version:` header > installed version. A docs-only commit at the current version is correct — installed sites receive it with the next functional release.
 - Every functional release = ONE commit containing all of: `Version:` header bump + `ARWP_VERSION` bump (agent-ready-wp.php), new `readme.txt` changelog section + `Stable tag:` update, and `CHANGELOG.TXT` update. PUC reads the header from `main`, so keep version + notes in the same commit.
 - Every functional release ALSO needs a GitHub Release (`vN.N.N` tag + published Release). PUC priority = latest Release → highest-version tag → `main` branch, so an old Release on the repo blocks all newer tags/branch versions until a new Release is published.
-- Publishing a Release auto-runs `.github/workflows/build-release-zip.yml`, which `rsync`s the repo root into an `agent-ready-wp/` staging folder EXCLUDING a blacklist (`.git`, `.github`, `.gitignore`, `AGENTS.md`, `index.html`, `.nojekyll`, dev-only `TODO.MD`/`DEVELOPMENT_PLAN.md`/`recommended-fix-gemini.md`, `staging`), zips it, and uploads `agent-ready-wp.zip` to that Release as an asset (since commit `5585e84`). New plugin files/dirs at the repo root are auto-included; a NEW repo-only root file requires adding it to the exclude list. The site at `akosiraffytot.github.io/agent-ready-wp` (GitHub Pages, source = `main` root, `index.html` + `.nojekyll`) has a Download button pointing at `releases/latest/download/agent-ready-wp.zip` (permanent latest-asset URL). If a Release has no `agent-ready-wp.zip` asset, that URL 404s — keep the asset attached on every functional release. Re-publishing a Release re-triggers the workflow (`--clobber` overwrites the asset).
+- Publishing a Release auto-runs `.github/workflows/build-release-zip.yml`, which `rsync`s the repo root into an `agent-ready-wp/` staging folder EXCLUDING a blacklist (`.git`, `.github`, `.gitignore`, `AGENTS.md`, `index.html`, `.nojekyll`, dev-only `TODO.MD`/`DEVELOPMENT_PLAN.md`/`recommended-fix-gemini.md`/`session-ses_*.md`, `staging`), zips it, and uploads `agent-ready-wp.zip` to that Release as an asset (since commit `5585e84`). New plugin files/dirs at the repo root are auto-included; a NEW repo-only root file requires adding it to the exclude list. The site at `akosiraffytot.github.io/agent-ready-wp` (GitHub Pages, source = `main` root, `index.html` + `.nojekyll`) has a Download button pointing at `releases/latest/download/agent-ready-wp.zip` (permanent latest-asset URL). If a Release has no `agent-ready-wp.zip` asset, that URL 404s — keep the asset attached on every functional release. Re-publishing a Release re-triggers the workflow (`--clobber` overwrites the asset).
 - `readme.txt` `Stable tag:` must always match the released code version.
 - Keep the plugin header `Description:` in sync with the readme short description (≤150 chars, no markup).
 - Push after any release commit; ask before running git commands.
-- Current released version: 1.0.4 (commit `5fc1410`). Next: bug fix → 1.0.5, feature → 1.1.0.
+- Current released version: 1.0.4 (commit `5fc1410`). 1.1.0 (schema
+  expansion) code-complete (Phases 1–7, all user-confirmed) but NOT yet
+  committed/released as of the last session; release = one commit bumping
+  header + `ARWP_VERSION` + readme `Stable tag` + changelog + `CHANGELOG.TXT`,
+  then tag `v1.1.0` + GitHub Release.
+
+## graphify
+
+This project has a knowledge graph at graphify-out/ with god nodes, community structure, and cross-file relationships.
+
+When the user types `/graphify`, use the installed graphify skill or instructions before doing anything else.
+
+Rules:
+- For codebase questions, first run `graphify query "<question>"` when graphify-out/graph.json exists. Use `graphify path "<A>" "<B>"` for relationships and `graphify explain "<concept>"` for focused concepts. These return a scoped subgraph, usually much smaller than GRAPH_REPORT.md or raw grep output.
+- Dirty graphify-out/ files are expected after hooks or incremental updates; dirty graph files are not a reason to skip graphify. Only skip graphify if the task is about stale or incorrect graph output, or the user explicitly says not to use it.
+- If graphify-out/wiki/index.md exists, use it for broad navigation instead of raw source browsing.
+- Read graphify-out/GRAPH_REPORT.md only for broad architecture review or when query/path/explain do not surface enough context.
+- After modifying code, run `graphify update .` to keep the graph current (AST-only, no API cost).

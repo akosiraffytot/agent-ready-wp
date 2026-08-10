@@ -215,6 +215,12 @@
 	opacity: 0.6;
 }
 
+.arwp-field-muted {
+	display: inline-block;
+	opacity: 0.55;
+	pointer-events: none;
+}
+
 @media (max-width: 782px) {
 	.arwp-jsonld-layout {
 		grid-template-columns: 1fr;

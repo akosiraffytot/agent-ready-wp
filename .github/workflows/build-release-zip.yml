@@ -20,6 +20,7 @@ jobs:
             --exclude='.git' --exclude='.github' --exclude='.gitignore' \
             --exclude='AGENTS.md' --exclude='index.html' --exclude='.nojekyll' \
             --exclude='TODO.MD' --exclude='DEVELOPMENT_PLAN.md' --exclude='recommended-fix-gemini.md' \
+            --exclude='session-ses_*.md' \
             --exclude='staging' \
             ./ staging/agent-ready-wp/
 

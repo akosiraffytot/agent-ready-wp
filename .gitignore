@@ -2,5 +2,12 @@
 TODO.MD
 DEVELOPMENT_PLAN.md
 recommended-fix-gemini.md
-session-ses_030c.md
+session-ses_*.md
 /doc/
+.opencode/
+
+# Graphify generated data
+graphify-out/
+
+# Local release-staging builds
+/staging/

@@ -120,6 +120,42 @@ function arwp_render_post_meta_box( $post ) {
 			placeholder='[{"q":"Question one?","a":"Answer one."}]'
 		><?php echo esc_textarea( $faq_data ); ?></textarea>
 		<?php arwp_field_description( __( 'JSON array of question/answer pairs for a FAQPage node, e.g. [{"q":"Question?","a":"Answer."}]. Saved data is normalized.', 'arwp' ), 'https://schema.org/FAQPage' ); ?>
+
+		<p>
+			<label for="arwp-service-enabled">
+				<input type="checkbox" id="arwp-service-enabled" name="_arwp_schema_service_enabled" value="1" <?php checked( get_post_meta( $post->ID, '_arwp_schema_service_enabled', true ), '1' ); ?>>
+				<strong><?php esc_html_e( 'Service schema', 'arwp' ); ?></strong>
+			</label>
+		</p>
+		<?php arwp_field_description( __( 'Emits an extra Service node next to the page content node. Use on pages describing a service this organization provides.', 'arwp' ), 'https://schema.org/Service' ); ?>
+
+		<div class="arwp-service-fields">
+			<p>
+				<label for="arwp-service-type"><strong><?php esc_html_e( 'Service type', 'arwp' ); ?></strong></label>
+			</p>
+			<input
+				type="text"
+				class="widefat"
+				id="arwp-service-type"
+				name="_arwp_schema_service_type"
+				value="<?php echo esc_attr( get_post_meta( $post->ID, '_arwp_schema_service_type', true ) ); ?>"
+				placeholder="Tours"
+			>
+			<?php arwp_field_description( __( '(Optional) Short label for the service category, e.g. "Tours" or "Consulting". Shown as serviceType.', 'arwp' ), 'https://schema.org/serviceType' ); ?>
+
+			<p>
+				<label for="arwp-service-price"><strong><?php esc_html_e( 'Service price', 'arwp' ); ?></strong></label>
+			</p>
+			<input
+				type="text"
+				class="widefat"
+				id="arwp-service-price"
+				name="_arwp_schema_service_price"
+				value="<?php echo esc_attr( get_post_meta( $post->ID, '_arwp_schema_service_price', true ) ); ?>"
+				placeholder="USD 50"
+			>
+			<?php arwp_field_description( __( '(Optional) Price text, e.g. "USD 50" or "From $25". Shown as offers.price.', 'arwp' ), 'https://schema.org/price' ); ?>
+		</div>
 	</div>
 	<?php
 }
@@ -201,6 +237,32 @@ function arwp_save_post_meta_box( $post_id ) {
 			}
 		} else {
 			delete_post_meta( $post_id, '_arwp_schema_faq_data' );
+		}
+	}
+
+	if ( isset( $_POST['_arwp_schema_service_enabled'] ) ) {
+		update_post_meta( $post_id, '_arwp_schema_service_enabled', '1' );
+	} else {
+		delete_post_meta( $post_id, '_arwp_schema_service_enabled' );
+	}
+
+	if ( isset( $_POST['_arwp_schema_service_type'] ) ) {
+		$service_type = sanitize_text_field( wp_unslash( $_POST['_arwp_schema_service_type'] ) );
+
+		if ( '' !== $service_type ) {
+			update_post_meta( $post_id, '_arwp_schema_service_type', $service_type );
+		} else {
+			delete_post_meta( $post_id, '_arwp_schema_service_type' );
+		}
+	}
+
+	if ( isset( $_POST['_arwp_schema_service_price'] ) ) {
+		$service_price = sanitize_text_field( wp_unslash( $_POST['_arwp_schema_service_price'] ) );
+
+		if ( '' !== $service_price ) {
+			update_post_meta( $post_id, '_arwp_schema_service_price', $service_price );
+		} else {
+			delete_post_meta( $post_id, '_arwp_schema_service_price' );
 		}
 	}
 }
