@@ -341,8 +341,9 @@ WordPress plugin "Agent Ready WP". Injects `@graph` JSON-LD for AI-agent readine
   - Release bookkeeping prepped in the working tree: header + `ARWP_VERSION`
     1.3.0, readme `Stable tag` + changelog + upgrade notice, `CHANGELOG.TXT`,
     this AGENTS.md entry, TODO.MD. `php -l` + `phpcs` (0/0) + `node --check`
-    clean. Commit + push + tag `v1.3.0` + GitHub Release + PUC update test
-    pending user go-ahead (sequence: release 1.2.1 first, then 1.3.0).
+    clean. **COMMITTED + PUSHED as `f847bce` on 2026-08-11.** Tag `v1.3.0` +
+    GitHub Release + PUC update test done manually by the user on the GitHub
+    UI (sequence: release 1.2.1 first, then 1.3.0).
 
 ## graphify
 
