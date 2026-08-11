@@ -53,11 +53,12 @@ function arwp_post_meta_types( $post_type = '' ) {
 function arwp_render_post_meta_box( $post ) {
 	wp_nonce_field( 'arwp_post_meta', 'arwp_post_meta_nonce' );
 
-	$about_uri   = get_post_meta( $post->ID, '_arwp_schema_about_uri', true );
-	$custom_type = get_post_meta( $post->ID, '_arwp_schema_custom_type', true );
-	$faq_data    = get_post_meta( $post->ID, '_arwp_schema_faq_data', true );
-	$author_name = get_the_author_meta( 'display_name', $post->post_author );
-	$author_link = get_edit_user_link( $post->post_author );
+	$about_uri    = get_post_meta( $post->ID, '_arwp_schema_about_uri', true );
+	$custom_type  = get_post_meta( $post->ID, '_arwp_schema_custom_type', true );
+	$faq_data     = get_post_meta( $post->ID, '_arwp_schema_faq_data', true );
+	$custom_image = get_post_meta( $post->ID, '_arwp_schema_image', true );
+	$author_name  = get_the_author_meta( 'display_name', $post->post_author );
+	$author_link  = get_edit_user_link( $post->post_author );
 
 	if ( ! in_array( $custom_type, arwp_post_meta_types( $post->post_type ), true ) ) {
 		$custom_type = 'default';
@@ -103,6 +104,20 @@ function arwp_render_post_meta_box( $post ) {
 			placeholder="https://www.wikidata.org/wiki/Q28343"
 		>
 		<?php arwp_field_description( __( '(Optional) Add a Wikidata or Wikipedia URL for the primary topic of this page. This tells AI agents (like ChatGPT, Perplexity, and Claude) precisely what real-world concept this content covers. Leave blank if not applicable.', 'arwp' ), 'https://en.wikipedia.org/wiki/Wikipedia:Finding_a_Wikidata_ID' ); ?>
+
+		<p>
+			<label for="arwp-schema-post-image"><strong><?php esc_html_e( 'Custom image (optional)', 'arwp' ); ?></strong></label>
+		</p>
+		<input
+			type="text"
+			class="widefat"
+			id="arwp-schema-post-image"
+			name="_arwp_schema_image"
+			value="<?php echo esc_attr( $custom_image ); ?>"
+			placeholder="https://example.com/page-image.jpg"
+		>
+		<button type="button" class="button" id="arwp-post-image-upload"><?php esc_html_e( 'Select from Media Library', 'arwp' ); ?></button>
+		<?php arwp_field_description( __( '(Optional) Overrides the featured image for this page\'s schema image. Falls back to the featured image, then to the Organization Image set on the JSON-LD settings page.', 'arwp' ), 'https://schema.org/image' ); ?>
 
 		<p>
 			<label for="arwp-custom-type"><strong><?php esc_html_e( 'Schema type', 'arwp' ); ?></strong></label>
@@ -216,6 +231,16 @@ function arwp_save_post_meta_box( $post_id ) {
 			update_post_meta( $post_id, '_arwp_schema_about_uri', $about_uri );
 		} else {
 			delete_post_meta( $post_id, '_arwp_schema_about_uri' );
+		}
+	}
+
+	if ( isset( $_POST['_arwp_schema_image'] ) ) {
+		$custom_image = sanitize_url( wp_unslash( $_POST['_arwp_schema_image'] ) );
+
+		if ( '' !== $custom_image ) {
+			update_post_meta( $post_id, '_arwp_schema_image', $custom_image );
+		} else {
+			delete_post_meta( $post_id, '_arwp_schema_image' );
 		}
 	}
 

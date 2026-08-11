@@ -272,31 +272,40 @@ function syncArwpConditionalSections() {
 } )();
 
 /**
- * Organization logo media-library picker. Bound on load so wp.media (enqueued
- * later in the footer) is defined by the time the handler attaches.
+ * Organization image/logo media-library pickers. Bound on load so wp.media
+ * (enqueued later in the footer) is defined by the time handlers attach.
  */
 window.addEventListener( 'load', function () {
-	var logoInput = document.getElementById( 'arwp-schema-org-logo' );
-	var logoButton = document.getElementById( 'arwp-logo-upload' );
+	var pickers = [
+		{ input: 'arwp-schema-org-logo', button: 'arwp-logo-upload', title: 'Select Logo Image' },
+		{ input: 'arwp-schema-org-image', button: 'arwp-image-upload', title: 'Select Organization Image' }
+	];
 
-	if ( ! logoInput || ! logoButton || ! window.wp || ! wp.media ) {
-		return;
+	for ( var i = 0; i < pickers.length; i++ ) {
+		var input = document.getElementById( pickers[ i ].input );
+		var button = document.getElementById( pickers[ i ].button );
+
+		if ( ! input || ! button || ! window.wp || ! wp.media ) {
+			continue;
+		}
+
+		button.addEventListener( 'click', ( function ( input, title ) {
+			return function ( e ) {
+				e.preventDefault();
+
+				var frame = wp.media( {
+					title: title,
+					multiple: false,
+					library: { type: 'image' }
+				} );
+
+				frame.on( 'select', function () {
+					var attachment = frame.state().get( 'selection' ).first().toJSON();
+					input.value = attachment.url;
+				} );
+
+				frame.open();
+			};
+		} )( input, pickers[ i ].title ) );
 	}
-
-	logoButton.addEventListener( 'click', function ( e ) {
-		e.preventDefault();
-
-		var frame = wp.media( {
-			title: 'Select Logo Image',
-			multiple: false,
-			library: { type: 'image' }
-		} );
-
-		frame.on( 'select', function () {
-			var attachment = frame.state().get( 'selection' ).first().toJSON();
-			logoInput.value = attachment.url;
-		} );
-
-		frame.open();
-	} );
 } );

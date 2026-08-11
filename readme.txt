@@ -3,7 +3,7 @@ Contributors: akosiraffytot
 Tags: json-ld, schema, structured data, schema.org, seo, knowledge graph
 Requires at least: 6.9
 Tested up to: 7.0.2
-Stable tag: 1.2.1
+Stable tag: 1.3.0
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -67,6 +67,13 @@ No. Output is a single small JSON-LD script in the head, built with standard Wor
 
 == Changelog ==
 
+= 1.3.0 =
+* New: the Organization node now emits a top-level telephone (the contactPoint block is kept alongside it).
+* New: the homepage WebPage node links to the business via about, so crawlers and AI agents know the page's primary subject.
+* New: knowsAbout plain-name topics are emitted as simple strings; Name|URL lines keep a typed Thing with a Wikidata sameAs reference — lighter output without losing entity disambiguation.
+* New: Organization Image URL field with a Media Library picker — the business photo, emitted as image on the Organization node.
+* New: per-page schema image — the content node uses the custom image set in the post editor, otherwise the post's featured image, otherwise the global Organization Image.
+
 = 1.2.1 =
 * Fixed: geo coordinates in the Organization node are now emitted as clean text values instead of floats, avoiding long decimal noise on servers with a high serialize_precision setting. schema.org accepts text for latitude/longitude.
 
@@ -110,6 +117,9 @@ No. Output is a single small JSON-LD script in the head, built with standard Wor
 * Automatic updates from GitHub (Plugin Update Checker).
 
 == Upgrade Notice ==
+
+= 1.3.0 =
+Adds a top-level telephone, a homepage about link to the business, a global Organization Image (with per-page fallback to featured/custom images), and slimmer knowsAbout output. Existing settings are preserved.
 
 = 1.2.1 =
 Fixes geo coordinate output (clean text instead of float precision noise). No settings changes.

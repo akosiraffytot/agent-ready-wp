@@ -93,6 +93,7 @@ function arwp_jsonld_register_settings() {
 	register_setting( 'arwp_jsonld_options', 'arwp_schema_merchant_return_policy', array( 'sanitize_callback' => 'esc_url_raw' ) );
 	register_setting( 'arwp_jsonld_options', 'arwp_schema_org_description', array( 'sanitize_callback' => 'sanitize_textarea_field' ) );
 	register_setting( 'arwp_jsonld_options', 'arwp_schema_org_logo', array( 'sanitize_callback' => 'esc_url_raw' ) );
+	register_setting( 'arwp_jsonld_options', 'arwp_schema_org_image', array( 'sanitize_callback' => 'esc_url_raw' ) );
 	register_setting( 'arwp_jsonld_options', 'arwp_schema_same_as', array( 'sanitize_callback' => 'arwp_sanitize_url_list' ) );
 	register_setting( 'arwp_jsonld_options', 'arwp_schema_knows_about', array( 'sanitize_callback' => 'arwp_sanitize_text_list' ) );
 	register_setting( 'arwp_jsonld_options', 'arwp_schema_website_name', array( 'sanitize_callback' => 'sanitize_text_field' ) );
@@ -140,6 +141,7 @@ function arwp_jsonld_register_settings() {
 	add_settings_field( 'arwp_schema_org_slogan', __( 'Slogan', 'arwp' ), 'arwp_field_org_slogan', 'arwp-jsonld', 'arwp_jsonld_section' );
 	add_settings_field( 'arwp_schema_org_description', __( 'Organization Description', 'arwp' ), 'arwp_field_org_description', 'arwp-jsonld', 'arwp_jsonld_section' );
 	add_settings_field( 'arwp_schema_org_logo', __( 'Organization Logo URL', 'arwp' ), 'arwp_field_org_logo', 'arwp-jsonld', 'arwp_jsonld_section' );
+	add_settings_field( 'arwp_schema_org_image', __( 'Organization Image URL', 'arwp' ), 'arwp_field_org_image', 'arwp-jsonld', 'arwp_jsonld_section' );
 	add_settings_field( 'arwp_schema_same_as', __( 'sameAs Profiles', 'arwp' ), 'arwp_field_same_as', 'arwp-jsonld', 'arwp_jsonld_section' );
 	add_settings_field( 'arwp_schema_knows_about', __( 'knowsAbout Topics', 'arwp' ), 'arwp_field_knows_about', 'arwp-jsonld', 'arwp_jsonld_section' );
 
@@ -816,23 +818,27 @@ function arwp_jsonld_area_served( $value ) {
 }
 
 /**
- * Parse a knowsAbout line into a typed Thing entry.
+ * Parse a knowsAbout line into a plain name string or a typed Thing entry.
+ *
+ * Plain names are emitted as strings for a lighter payload; URL-bearing
+ * lines keep a Thing entry so the Wikidata/sameAs reference is preserved.
  *
  * Accepted formats:
- *   - "https://.../Q1544282"                    -> Thing + sameAs
- *   - "Sustainable Tourism"                     -> Thing + name
+ *   - "Sustainable Tourism"                      -> "Sustainable Tourism" (string)
+ *   - "https://.../Q1544282"                     -> Thing + sameAs
  *   - "Sustainable Tourism|https://.../Q1544282" -> Thing + name + sameAs
  *
  * @param string $line Raw knowsAbout line.
- * @return array
+ * @return string|array
  */
 function arwp_jsonld_parse_thing( $line ) {
 	$parts = array_map( 'trim', explode( '|', $line ) );
 
-	$entry = array( '@type' => 'Thing' );
-
 	if ( 2 === count( $parts ) ) {
-		$entry['name'] = $parts[0];
+		$entry = array(
+			'@type' => 'Thing',
+			'name'  => $parts[0],
+		);
 
 		if ( false !== strpos( $parts[1], '://' ) ) {
 			$entry['sameAs'] = $parts[1];
@@ -842,12 +848,13 @@ function arwp_jsonld_parse_thing( $line ) {
 	}
 
 	if ( false !== strpos( $parts[0], '://' ) ) {
-		$entry['sameAs'] = $parts[0];
-	} elseif ( '' !== $parts[0] ) {
-		$entry['name'] = $parts[0];
+		return array(
+			'@type'  => 'Thing',
+			'sameAs' => $parts[0],
+		);
 	}
 
-	return $entry;
+	return $parts[0];
 }
 
 /**
@@ -1219,6 +1226,11 @@ function arwp_jsonld_build_global_nodes( $values = array() ) {
 		$organization['logo'] = $logo;
 	}
 
+	$image = arwp_jsonld_value( 'arwp_schema_org_image', $values );
+	if ( '' !== $image ) {
+		$organization['image'] = $image;
+	}
+
 	$tax_id = arwp_jsonld_value( 'arwp_schema_org_tax_id', $values );
 	if ( '' !== $tax_id ) {
 		$organization['taxID'] = $tax_id;
@@ -1262,6 +1274,10 @@ function arwp_jsonld_build_global_nodes( $values = array() ) {
 	$languages = arwp_jsonld_value( 'arwp_schema_contact_languages', $values );
 	if ( '' !== $languages ) {
 		$contact['availableLanguage'] = array_values( array_filter( array_map( 'trim', explode( ',', $languages ) ) ) );
+	}
+
+	if ( '' !== $telephone ) {
+		$organization['telephone'] = $telephone;
 	}
 
 	if ( ! empty( $contact ) ) {
@@ -1521,6 +1537,11 @@ function arwp_jsonld_build_page_node( $values = array() ) {
 		'publisher' => arwp_jsonld_ref( 'Organization', $home . '#organization' ),
 	);
 
+	$image = get_option( 'arwp_schema_org_image', '' );
+	if ( '' !== $image ) {
+		$node['image'] = $image;
+	}
+
 	return arwp_jsonld_apply_custom( $node, arwp_jsonld_value( 'arwp_schema_custom_content', $values ), $home );
 }
 
@@ -1659,8 +1680,23 @@ function arwp_jsonld_build_content_node( $post ) {
 			'@type'  => 'Thing',
 			'sameAs' => $about_uri,
 		);
-	} elseif ( 'AboutPage' === $type ) {
+	} elseif ( 'AboutPage' === $type || ( is_front_page() && 'WebPage' === $type ) ) {
 		$node['about'] = arwp_jsonld_ref( 'Organization', $home . '#organization' );
+	}
+
+	$custom_image = get_post_meta( $post->ID, '_arwp_schema_image', true );
+	$image        = $custom_image;
+
+	if ( '' === $image ) {
+		$image = get_the_post_thumbnail_url( $post );
+	}
+
+	if ( ! $image ) {
+		$image = get_option( 'arwp_schema_org_image', '' );
+	}
+
+	if ( '' !== $image ) {
+		$node['image'] = $image;
 	}
 
 	if ( ! empty( $faq_data ) ) {
@@ -2193,6 +2229,7 @@ function arwp_ajax_preview_jsonld() {
 		'arwp_schema_merchant_return_policy' => 'esc_url_raw',
 		'arwp_schema_org_description'        => 'sanitize_textarea_field',
 		'arwp_schema_org_logo'               => 'esc_url_raw',
+		'arwp_schema_org_image'              => 'esc_url_raw',
 		'arwp_schema_same_as'                => 'arwp_sanitize_url_list',
 		'arwp_schema_knows_about'            => 'arwp_sanitize_text_list',
 		'arwp_schema_website_name'           => 'sanitize_text_field',
@@ -2291,6 +2328,28 @@ function arwp_field_org_logo() {
 }
 
 /**
+ * Render the organization image field.
+ */
+function arwp_field_org_image() {
+	$value = get_option( 'arwp_schema_org_image', '' );
+	?>
+	<input
+		id="arwp-schema-org-image"
+		class="regular-text"
+		type="text"
+		name="arwp_schema_org_image"
+		value="<?php echo esc_attr( $value ); ?>"
+		placeholder="https://example.com/storefront.jpg"
+	>
+	<button type="button" class="button" id="arwp-image-upload"><?php esc_html_e( 'Select from Media Library', 'arwp' ); ?></button>
+	<?php
+	arwp_field_description(
+		__( 'Full URL to a photo of your organization, e.g. a storefront or team photo. Emitted as image on the Organization node; your logo is emitted separately.', 'arwp' ),
+		'https://schema.org/image'
+	);
+}
+
+/**
  * Render the organization description field.
  */
 function arwp_field_org_description() {
@@ -2319,7 +2378,7 @@ function arwp_field_same_as() {
 function arwp_field_knows_about() {
 	arwp_textarea_field(
 		'arwp_schema_knows_about',
-		__( 'The main subjects your organization is known for. One per line: a name (e.g. "Sustainable Tourism"), a Wikidata URL, or a NAME|URL pair for both (e.g. "Sustainable Tourism|https://www.wikidata.org/wiki/Q1544282"). Shown as knowsAbout.', 'arwp' ),
+		__( 'The main subjects your organization is known for. One per line: a name (e.g. "Sustainable Tourism"), a Wikidata URL, or a NAME|URL pair for both (e.g. "Sustainable Tourism|https://www.wikidata.org/wiki/Q1544282"). Plain names are emitted as strings; URL or NAME|URL lines become a Thing with a sameAs reference. Shown as knowsAbout.', 'arwp' ),
 		'https://schema.org/knowsAbout'
 	);
 }
@@ -2421,7 +2480,7 @@ function arwp_field_contact_telephone() {
 		'arwp_schema_contact_telephone',
 		'+1-555-0100',
 		'text',
-		__( 'Public contact phone number in international format. Shown as contactPoint.telephone.', 'arwp' ),
+		__( 'Public contact phone number in international format. Emitted as telephone on the Organization node and inside contactPoint.', 'arwp' ),
 		'https://schema.org/telephone'
 	);
 }

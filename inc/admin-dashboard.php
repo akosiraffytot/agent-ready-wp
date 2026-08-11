@@ -54,6 +54,8 @@ function arwp_admin_enqueue( $hook_suffix ) {
 			(string) filemtime( ARWP_PATH . 'assets/arwp-editor.css' )
 		);
 
+		wp_enqueue_media();
+
 		wp_enqueue_script(
 			'arwp-editor',
 			ARWP_URL . 'assets/arwp-editor.js',

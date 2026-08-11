@@ -1,5 +1,12 @@
 === Agent Ready WP Changelog ===
 
+= 1.3.0 =
+* New: top-level `telephone` on the Organization node — emitted alongside the existing `contactPoint` block for Google's LocalBusiness parser compatibility.
+* New: the homepage `WebPage` node now links to the business via `about` (Organization @id), so crawlers and AI agents know the page's primary subject.
+* New: `knowsAbout` plain-name topics are emitted as simple strings; `Name|URL` and URL-only lines keep a typed `Thing` with a Wikidata `sameAs` reference — lighter payload without losing entity disambiguation.
+* New: Organization Image URL field with a Media Library picker — the business photo, emitted as `image` on the Organization node (distinct from `logo`).
+* New: per-page schema `image` — each content node uses the custom image set in the post editor meta box, otherwise the post's featured image, otherwise the global Organization Image.
+
 = 1.2.1 =
 * Fixed: Organization geo latitude/longitude are now emitted as clean text values (e.g. "34.85698") instead of floats, so no long decimal precision noise appears on servers with a high serialize_precision setting. schema.org's latitude/longitude accept Text.
 

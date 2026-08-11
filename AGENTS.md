@@ -290,17 +290,59 @@ WordPress plugin "Agent Ready WP". Injects `@graph` JSON-LD for AI-agent readine
   "Location & Local Information" rename/coverage + Custom JSON-LD escape
   hatch (4 textareas, `name|JSON`, `{home}`, `#` comments, duplicate names →
   arrays, invalid lines dropped with a notice) + WPCS-clean pass.
-- 1.2.1 (in progress, PREPPED — commit NOT yet made): geo fix — the
+- 1.2.1 (PREPPED, committed + pushed as `ba9e46b` on 2026-08-11 — tag
+  `v1.2.1` + GitHub Release NOT yet created by the user): geo fix — the
   Organization node's `latitude`/`longitude` were cast to `(float)`, so
   servers with a high php.ini `serialize_precision` dumped the full ~54-digit
   IEEE754 expansion (e.g. `34.85698000000000007503331289626657962799072265625`)
   in the JSON output. FIX: emit the sanitized string as-is
   (module-json-ld.php, `arwp_jsonld_build_global_nodes()`, geo block) —
   schema.org's `latitude`/`longitude` accept Text, so the output is clean on
-  any server. Release bookkeeping prepped: header + `ARWP_VERSION` 1.2.1,
-  readme `Stable tag` + changelog + upgrade notice, `CHANGELOG.TXT`, AGENTS.md,
-  TODO.MD. Commit + push + tag `v1.2.1` + GitHub Release + PUC update test
-  still pending user go-ahead.
+  any server. Release bookkeeping in that commit: header + `ARWP_VERSION`
+  1.2.1, readme `Stable tag` + changelog + upgrade notice, `CHANGELOG.TXT`,
+  AGENTS.md, TODO.MD. Tag + GitHub Release + PUC update test still pending
+  user go-ahead.
+- 1.3.0 (PREPPED, working-tree only — commit NOT yet made; user held commit
+  for after 1.2.1 release sequencing): five changes, all in
+  `modules/module-json-ld.php` unless noted, sharing the same builders so the
+  settings-page preview can't diverge from live output:
+  - **Top-level `telephone`:** `arwp_jsonld_build_global_nodes()` emits
+    `$organization['telephone']` whenever the contact telephone option is set,
+    alongside the existing `contactPoint` block (email/contactType/languages
+    stay there). Matches Google's LocalBusiness parser expectations.
+  - **Homepage `about`:** `arwp_jsonld_build_content_node()` adds
+    `about` → Organization ref when the front page resolves to `WebPage`
+    (`is_front_page() && 'WebPage' === $type`), joining the existing AboutPage
+    branch. Posts/Article are NOT given a forced `about`. **Option C decision
+    (user-approved):** the settings-page preview still uses the mock
+    `arwp_jsonld_build_page_node()` (a BlogPosting example), so front-page-only
+    output (`about`) legitimately does NOT appear in the preview — this is
+    deliberate, not a bug.
+  - **knowsAbout hybrid:** `arwp_jsonld_parse_thing()` returns a plain string
+    for name-only lines and keeps `{ "@type": "Thing", "name"/"sameAs" }` for
+    URL / `Name|URL` lines, so the payload is lighter without losing Wikidata
+    sameAs disambiguation. Field helper text updated.
+  - **Organization Image URL** (`arwp_schema_org_image`, `esc_url_raw`):
+    new field with Media Library picker, emitted as `organization['image']`
+    (distinct from `logo`). The picker JS in `assets/arwp-admin.js` was
+    generalized from the logo-only handler to a `pickers` config loop
+    (logo + image). **Known UX gap (not fixed):** programmatic `input.value`
+    from the picker fires no `input`/`change` event, so the live preview does
+    not refresh until the next save/reload — the user confirmed the value does
+    appear in preview after that, so no change was made.
+  - **Per-page schema image:** content nodes now emit `image` resolved as
+    custom meta box image (`_arwp_schema_image`, new URL field + picker in
+    `inc/post-meta-boxes.php`, saved with `sanitize_url`) → featured image
+    (`get_the_post_thumbnail_url`) → global `arwp_schema_org_image` → omitted.
+    `inc/admin-dashboard.php` now calls `wp_enqueue_media()` on post editors;
+    `assets/arwp-editor.js` gained a load-bound picker for the meta box field.
+    The preview mock node shows the global-image fallback. Verified
+    functionally (custom/featured/global chain + meta box render).
+  - Release bookkeeping prepped in the working tree: header + `ARWP_VERSION`
+    1.3.0, readme `Stable tag` + changelog + upgrade notice, `CHANGELOG.TXT`,
+    this AGENTS.md entry, TODO.MD. `php -l` + `phpcs` (0/0) + `node --check`
+    clean. Commit + push + tag `v1.3.0` + GitHub Release + PUC update test
+    pending user go-ahead (sequence: release 1.2.1 first, then 1.3.0).
 
 ## graphify
 
