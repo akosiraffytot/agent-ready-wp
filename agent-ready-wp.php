@@ -3,17 +3,19 @@
  * Plugin Name: Agent Ready WP
  * Plugin URI:  https://github.com/akosiraffytot/agent-ready-wp
  * Description: Zero-bloat JSON-LD plugin that automatically emits a full Schema.org @graph on every page for search engines and AI agents.
- * Version:     1.1.0
+ * Version:     1.2.0
  * Author:      Rafael Mendoza
- * Author URI:	https://akosiraffytot.dev/
- * License:	GPL v2 or later
- * License URI:	https://www.gnu.org/licenses/gpl-2.0.html
+ * Author URI:  https://akosiraffytot.dev/
+ * License: GPL v2 or later
+ * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain: arwp
+ *
+ * @package Agent_Ready_WP
  */
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'ARWP_VERSION', '1.1.0' );
+define( 'ARWP_VERSION', '1.2.0' );
 define( 'ARWP_PATH', plugin_dir_path( __FILE__ ) );
 define( 'ARWP_URL', plugin_dir_url( __FILE__ ) );
 define( 'ARWP_GITHUB_REPO', 'akosiraffytot/agent-ready-wp' );
@@ -46,7 +48,7 @@ if ( file_exists( ARWP_PATH . 'lib/plugin-update-checker/plugin-update-checker.p
  */
 function arwp_get_modules() {
 	return array(
-		'json_ld' => array(
+		'json_ld'     => array(
 			'title'          => 'JSON-LD Schema',
 			'description'    => 'Adds JSON-LD structured data so AI agents and search engines understand your content.',
 			'icon'           => 'dashicons-schedule',
@@ -55,7 +57,7 @@ function arwp_get_modules() {
 			'settings_slug'  => 'arwp-jsonld',
 			'soon'           => false,
 		),
-		'llm_txt' => array(
+		'llm_txt'     => array(
 			'title'          => 'llm.txt',
 			'description'    => 'Serve a machine-readable /llm.txt markdown summary.',
 			'icon'           => 'dashicons-media-text',
@@ -64,7 +66,7 @@ function arwp_get_modules() {
 			'settings_slug'  => '',
 			'soon'           => true,
 		),
-		'ai_robots' => array(
+		'ai_robots'   => array(
 			'title'          => 'AI Robots',
 			'description'    => 'Directives for AI crawlers in robots.txt.',
 			'icon'           => 'dashicons-shield-alt',
@@ -118,8 +120,8 @@ register_activation_hook( __FILE__, 'arwp_activate' );
  * Load active modules. Each module file self-registers its hooks.
  */
 function arwp_load_modules() {
-	$registry    = arwp_get_modules();
-	$active      = get_option( 'arwp_schema_active_modules', arwp_get_default_modules() );
+	$registry = arwp_get_modules();
+	$active   = get_option( 'arwp_schema_active_modules', arwp_get_default_modules() );
 
 	// json_ld always loads so its settings page stays reachable even when the
 	// module is toggled off. Front-end output gates on the active option.

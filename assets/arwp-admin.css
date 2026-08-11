@@ -230,3 +230,86 @@
 		position: static;
 	}
 }
+
+.arwp-org-type-picker {
+	position: relative;
+	max-width: 480px;
+}
+
+.arwp-org-type-tokens {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+	margin-bottom: 8px;
+}
+
+.arwp-org-type-token {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	background: #2271b1;
+	color: #fff;
+	border-radius: 12px;
+	padding: 2px 4px 2px 10px;
+	font-size: 12px;
+	line-height: 20px;
+}
+
+.arwp-org-type-remove {
+	border: 0;
+	background: transparent;
+	color: inherit;
+	cursor: pointer;
+	font-size: 14px;
+	line-height: 20px;
+	padding: 0 6px;
+	border-radius: 50%;
+}
+
+.arwp-org-type-remove:hover {
+	background: rgba(255, 255, 255, 0.25);
+}
+
+.arwp-org-type-list {
+	position: absolute;
+	z-index: 20;
+	left: 0;
+	right: 0;
+	top: calc(100% + 2px);
+	background: #fff;
+	border: 1px solid #8c8f94;
+	border-radius: 4px;
+	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+	max-height: 260px;
+	overflow: auto;
+}
+
+.arwp-org-type-group-label {
+	padding: 6px 10px 2px;
+	font-size: 11px;
+	font-weight: 600;
+	text-transform: uppercase;
+	color: #646970;
+}
+
+.arwp-org-type-option {
+	display: block;
+	width: 100%;
+	text-align: left;
+	border: 0;
+	background: transparent;
+	padding: 6px 10px;
+	cursor: pointer;
+	font-size: 13px;
+}
+
+.arwp-org-type-option:hover {
+	background: #f0f6fc;
+	color: #2271b1;
+}
+
+.arwp-org-type-empty {
+	padding: 8px 10px;
+	color: #646970;
+	font-size: 13px;
+}

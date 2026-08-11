@@ -159,7 +159,7 @@ function arwp_render_dashboard() {
 								data-settings-slug="<?php echo esc_attr( $module['settings_slug'] ); ?>"
 								<?php echo empty( $active[ $id ] ) ? '' : 'checked'; ?>
 								<?php echo esc_attr( $module['soon'] ? 'disabled' : '' ); ?>
-								aria-label="<?php echo esc_attr( sprintf( __( 'Toggle %s module', 'arwp' ), $module['title'] ) ); ?>"
+								aria-label="<?php /* translators: %s: module name. */ echo esc_attr( sprintf( __( 'Toggle %s module', 'arwp' ), $module['title'] ) ); ?>"
 							>
 							<span class="arwp-slider" aria-hidden="true"></span>
 						</label>
@@ -182,7 +182,7 @@ function arwp_ajax_toggle_module() {
 	}
 
 	$module  = isset( $_POST['module'] ) ? sanitize_key( wp_unslash( $_POST['module'] ) ) : '';
-	$enabled = ( '1' === sanitize_text_field( wp_unslash( $_POST['enabled'] ) ) );
+	$enabled = isset( $_POST['enabled'] ) ? ( '1' === sanitize_text_field( wp_unslash( $_POST['enabled'] ) ) ) : false;
 
 	$registry = arwp_get_modules();
 
@@ -204,6 +204,11 @@ function arwp_ajax_toggle_module() {
 
 	update_option( 'arwp_schema_active_modules', $active );
 
-	wp_send_json_success( array( 'module' => $module, 'enabled' => $enabled ) );
+	wp_send_json_success(
+		array(
+			'module'  => $module,
+			'enabled' => $enabled,
+		)
+	);
 }
 add_action( 'wp_ajax_arwp_toggle_module', 'arwp_ajax_toggle_module' );

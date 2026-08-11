@@ -58,12 +58,14 @@ add_action( 'edit_user_profile', 'arwp_render_user_schema_fields' );
 
 /**
  * Save the author schema fields. Core verifies the profile form nonce before
- * these actions fire; we add the capability check.
+ * these actions fire; we re-verify and add the capability check.
  *
  * @param int $user_id User ID being saved.
  * @return bool
  */
 function arwp_save_user_schema_fields( $user_id ) {
+	check_admin_referer( 'update-user_' . $user_id );
+
 	if ( ! current_user_can( 'edit_user', $user_id ) ) {
 		return false;
 	}
@@ -73,6 +75,7 @@ function arwp_save_user_schema_fields( $user_id ) {
 	}
 
 	if ( isset( $_POST['arwp_author_same_as'] ) ) {
+		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput -- sanitized per URL by arwp_sanitize_url_list().
 		update_user_meta( $user_id, 'arwp_author_same_as', arwp_sanitize_url_list( wp_unslash( $_POST['arwp_author_same_as'] ) ) );
 	}
 

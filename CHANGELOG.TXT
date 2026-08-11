@@ -1,5 +1,15 @@
 === Agent Ready WP Changelog ===
 
+= 1.2.0 =
+* New: multi-type Organization selector — several Schema.org subtypes can be selected at once (e.g. LocalBusiness + ClothingStore); the Organization node emits `@type` as an array and the settings sections union across all selected types.
+* New: field clusters for niche types — dining (servesCuisine, acceptsReservations, hasMenu), hospitality (starRating, numberOfRooms, checkinTime, checkoutTime, petsAllowed), medical (medicalSpecialty, availableService), education (department, alumni), civic & community (affiliation, sport).
+* New: "Location & Local Information" section now also applies to education/civic types, NGOs, news media, and corporations.
+* New: Custom JSON-LD escape hatch — name|JSON lines merged into the Organization, WebSite, and content nodes, or appended to the graph; {home} placeholder, # comments, duplicate names become arrays, invalid lines dropped with a notice.
+* Fixed: settings toggles (acceptsReservations, petsAllowed) now emit correctly (strict string comparison against an int-stored option).
+* Fixed: author profile schema save now explicitly re-verifies the profile form nonce (defense in depth; core already verifies it before these hooks fire).
+* Fixed: module toggle no longer reads a possibly-missing `enabled` request key without a guard.
+* Improved: full WordPress Coding Standards pass — phpcbf formatting (line endings, alignment), docblocks on all settings field/section renderers, translators comments on placeholder strings; `phpcs --standard=WordPress` reports 0 errors and 0 warnings on all 6 plugin files.
+
 = 1.1.0 =
 * New: organization type selector — 54 Schema.org subtypes (LocalBusiness/MedicalBusiness, non-profit, news media, corporation, online business, and store types) with conditional settings sections.
 * New: Organization identity fields: legalName, slogan, taxID, vatID, foundingDate, founder, areaServed, contactPoint (telephone, email, contactType, availableLanguage), sameAs, knowsAbout.

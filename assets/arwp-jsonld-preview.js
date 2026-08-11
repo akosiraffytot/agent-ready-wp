@@ -106,10 +106,13 @@
 					render( currentJson );
 					updateValidateLink();
 					setButtonsEnabled( true );
+				} else {
+					setButtonsEnabled( true );
 				}
 				setLoading( false );
 			} )
 			.catch( function () {
+				setButtonsEnabled( true );
 				setLoading( false );
 			} );
 	}

@@ -98,6 +98,64 @@ WordPress plugin "Agent Ready WP". Injects `@graph` JSON-LD for AI-agent readine
   their own group `arwp_jsonld_options` (`register_setting` +
   `settings_fields`); general Settings keeps `arwp_schema_options`. Option
   names unchanged, so `get_option()` reads and stored data are unaffected.
+- 1.2.0 (multi-type + clusters + escape hatch): all three phases complete,
+  user-confirmed. Changes live in `modules/module-json-ld.php` (+
+  `assets/arwp-admin.js`, `assets/arwp-admin.css`,
+  `assets/arwp-jsonld-preview.js`):
+  - **Multi-type Organization selector:** `arwp_schema_org_type` is now an
+    ARRAY of types (legacy string wrapped). `arwp_schema_org_categories()` is
+    the source of truth (56 types); `arwp_schema_org_group_map()` maps each
+    type to one of 10 groups (local_business/ngo/news_media/corporation/
+    commerce/dining/hospitality/medical/education/civic_community); the
+    builder emits `@type` as string or array and unions settings sections via
+    `$org_groups`. Pill/token multi-select in the JSON-LD settings page
+    (data-list of `.arwp-org-token`, `data-type` field, X chips), JS in
+    `assets/arwp-admin.js`.
+  - **Field clusters:** 14 options — dining (serves_cuisine,
+    accepts_reservations, menu_url), hospitality (star_rating, num_rooms,
+    checkin_time, checkout_time, pets_allowed), medical (medical_specialty,
+    available_service), education (departments, alumni), civic_community
+    (affiliation, sport). Sanitizers: `arwp_sanitize_rating` (0–5 float),
+    `arwp_sanitize_time` (HH:MM regex). Entity fields use
+    `arwp_jsonld_named_entities()` (NAME|URL lines → Service/Organization/
+    Person nodes). Toggles emit via `'1' === (string) arwp_jsonld_value(...)`
+    (absint stores int, strict string compare failed before — Phase 2 fix).
+  - **"Location & Local Information"** section (renamed from "Local Business")
+    now also applies to education/civic types, NGOs, news media, and
+    corporations via group union.
+  - **Custom JSON-LD escape hatch:** options `arwp_schema_custom_org/website/
+    content/graph` (4 textareas). `arwp_sanitize_custom_json()` validates
+    `name|JSON` lines (`{home}` placeholder, `#` comments, duplicate names →
+    arrays; invalid lines dropped + settings notice). `arwp_jsonld_parse_custom()`
+    returns name→JSON map (scalars allowed — `null === $decoded` guard, NOT
+    `! is_array()`); `arwp_jsonld_apply_custom()` merges (duplicate-name
+    crash fixed by normalizing to array before append); `arwp_jsonld_custom_graph()`
+    wraps graph-node blocks. Merged into org/website in
+    `arwp_jsonld_build_global_nodes()` (BEFORE the `agent_ready_organization_node`
+    filter), content in `arwp_jsonld_build_content_node()` +
+    `arwp_jsonld_build_page_node()`, graph appended in `arwp_jsonld_build_graph()`
+    AND the preview AJAX (`arwp_ajax_preview_jsonld()`, whitelist synced) so
+    preview matches live output. Preview buttons re-enable on AJAX failure
+    (`refresh()` in `assets/arwp-jsonld-preview.js`).
+  - **WPCS pass (2026-08-11):** `phpcs --standard=WordPress` reports 0 errors /
+    0 warnings on all 6 plugin PHP files. `phpcbf` fixed CRLF line endings +
+    alignment; 75 docblocks added to the settings field/section renderers;
+    `translators:` comments on 4 placeholder strings; `@package` added to the
+    plugin header. Two real hardening fixes: `isset` guard on `$_POST['enabled']`
+    in `arwp_ajax_toggle_module()` (inc/admin-dashboard.php) and
+    `check_admin_referer( 'update-user_' . $user_id )` added to
+    `arwp_save_user_schema_fields()` (inc/user-profile.php; core already
+    verifies this nonce, this is defense in depth). Three documented
+    `phpcs:ignore` false positives: the `wp_head` JSON echo (already hex-escaped
+    by `wp_json_encode` + JSON_HEX_TAG), the preview AJAX `$_POST` routed to
+    per-field `arwp_sanitize_*` callbacks via `call_user_func`, and the profile
+    `sameAs` url-list sanitizer.
+  - Docs updated (doc/ is gitignored): §4.1 conditional bullets, §4.5 title,
+    §4.10–4.14 (Dining/Hospitality/Medical/Education/Civic), §4.15–4.17
+    renumbered, §4.18 Custom JSON-LD, §12. Release bookkeeping prepped in
+    this repo's committed files (readme.txt, CHANGELOG.TXT, AGENTS.md,
+    header + `ARWP_VERSION` = 1.2.0); the commit/push/tag/release was
+    deferred by the user to the next session.
 - Validate Schema (admin bar): current **1.0.2** builds the prefilled
   `validator.schema.org/?code=` link SERVER-SIDE with NO JS. The node `href` is
   left `''` so WP never runs the URL through `esc_url()` (its `clean_url` CRLF
@@ -209,7 +267,7 @@ WordPress plugin "Agent Ready WP". Injects `@graph` JSON-LD for AI-agent readine
 ## Verification
 
 - Lint: `php -l <file>` (PHP 8.3 CLI available on this Laragon box). Run after every phase.
-- PHPCS with `WordPress` standard if available; manual nonce/capability audit otherwise.
+- PHPCS with `WordPress` standard: `phpcs --standard=WordPress <file>` must return 0 errors (0 warnings) on every plugin PHP file (all 6 files verified clean as of 1.2.0). Run `phpcbf --standard=WordPress` to auto-fix formatting (CRLF, alignment) before manual fixes. Known documented false positives are suppressed with `// phpcs:ignore` (JSON output already hex-escaped by `wp_json_encode`; `$_POST` passed to per-field `arwp_sanitize_*` callbacks; `sameAs` url-list sanitizer). Manual nonce/capability audit otherwise.
 - No automated test framework. User manually tests in `plugindev` WP install; you must supply concrete test steps per phase.
 
 ## Versioning & releases
@@ -222,11 +280,18 @@ WordPress plugin "Agent Ready WP". Injects `@graph` JSON-LD for AI-agent readine
 - `readme.txt` `Stable tag:` must always match the released code version.
 - Keep the plugin header `Description:` in sync with the readme short description (≤150 chars, no markup).
 - Push after any release commit; ask before running git commands.
-- Current released version: 1.0.4 (commit `5fc1410`). 1.1.0 (schema
-  expansion) code-complete (Phases 1–7, all user-confirmed) but NOT yet
-  committed/released as of the last session; release = one commit bumping
-  header + `ARWP_VERSION` + readme `Stable tag` + changelog + `CHANGELOG.TXT`,
-  then tag `v1.1.0` + GitHub Release.
+- Current released version: 1.2.0 (release bookkeeping complete; commit
+  NOT yet made — commit + push + tag `v1.2.0` + GitHub Release + PUC update
+  test).
+  1.2.0 = multi-type Organization selector (pill/token multi-select, `@type`
+  array + unioned conditional sections) + per-niche field clusters (dining,
+  hospitality, medical, education, civic_community — 14 options) +
+  "Location & Local Information" rename/coverage + Custom JSON-LD escape
+  hatch (4 textareas, `name|JSON`, `{home}`, `#` comments, duplicate names →
+  arrays, invalid lines dropped with a notice) + WPCS-clean pass. Release =
+  the prepped commit bumping header + `ARWP_VERSION` + readme `Stable tag` +
+  changelog + `CHANGELOG.TXT` + AGENTS.md + docs, then tag `v1.2.0` + GitHub
+  Release.
 
 ## graphify
 

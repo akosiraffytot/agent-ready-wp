@@ -100,6 +100,24 @@ function arwp_jsonld_register_settings() {
 	register_setting( 'arwp_jsonld_options', 'arwp_schema_default_post_type', array( 'sanitize_callback' => 'arwp_sanitize_post_type' ) );
 	register_setting( 'arwp_jsonld_options', 'arwp_schema_default_page_type', array( 'sanitize_callback' => 'arwp_sanitize_page_type' ) );
 	register_setting( 'arwp_jsonld_options', 'arwp_schema_default_other_type', array( 'sanitize_callback' => 'arwp_sanitize_other_type' ) );
+	register_setting( 'arwp_jsonld_options', 'arwp_schema_serves_cuisine', array( 'sanitize_callback' => 'sanitize_text_field' ) );
+	register_setting( 'arwp_jsonld_options', 'arwp_schema_accepts_reservations', array( 'sanitize_callback' => 'absint' ) );
+	register_setting( 'arwp_jsonld_options', 'arwp_schema_menu_url', array( 'sanitize_callback' => 'esc_url_raw' ) );
+	register_setting( 'arwp_jsonld_options', 'arwp_schema_star_rating', array( 'sanitize_callback' => 'arwp_sanitize_rating' ) );
+	register_setting( 'arwp_jsonld_options', 'arwp_schema_num_rooms', array( 'sanitize_callback' => 'absint' ) );
+	register_setting( 'arwp_jsonld_options', 'arwp_schema_checkin_time', array( 'sanitize_callback' => 'arwp_sanitize_time' ) );
+	register_setting( 'arwp_jsonld_options', 'arwp_schema_checkout_time', array( 'sanitize_callback' => 'arwp_sanitize_time' ) );
+	register_setting( 'arwp_jsonld_options', 'arwp_schema_pets_allowed', array( 'sanitize_callback' => 'absint' ) );
+	register_setting( 'arwp_jsonld_options', 'arwp_schema_medical_specialty', array( 'sanitize_callback' => 'sanitize_text_field' ) );
+	register_setting( 'arwp_jsonld_options', 'arwp_schema_available_service', array( 'sanitize_callback' => 'arwp_sanitize_text_list' ) );
+	register_setting( 'arwp_jsonld_options', 'arwp_schema_departments', array( 'sanitize_callback' => 'arwp_sanitize_text_list' ) );
+	register_setting( 'arwp_jsonld_options', 'arwp_schema_alumni', array( 'sanitize_callback' => 'arwp_sanitize_text_list' ) );
+	register_setting( 'arwp_jsonld_options', 'arwp_schema_affiliation', array( 'sanitize_callback' => 'arwp_sanitize_text_list' ) );
+	register_setting( 'arwp_jsonld_options', 'arwp_schema_sport', array( 'sanitize_callback' => 'sanitize_text_field' ) );
+	register_setting( 'arwp_jsonld_options', 'arwp_schema_custom_org', array( 'sanitize_callback' => 'arwp_sanitize_custom_json' ) );
+	register_setting( 'arwp_jsonld_options', 'arwp_schema_custom_website', array( 'sanitize_callback' => 'arwp_sanitize_custom_json' ) );
+	register_setting( 'arwp_jsonld_options', 'arwp_schema_custom_content', array( 'sanitize_callback' => 'arwp_sanitize_custom_json' ) );
+	register_setting( 'arwp_jsonld_options', 'arwp_schema_custom_graph', array( 'sanitize_callback' => 'arwp_sanitize_custom_json' ) );
 
 	add_settings_section(
 		'arwp_org_type_section',
@@ -152,7 +170,7 @@ function arwp_jsonld_register_settings() {
 
 	add_settings_section(
 		'arwp_local_section',
-		__( 'Local Business', 'arwp' ),
+		__( 'Location & Local Information', 'arwp' ),
 		'arwp_local_section_cb',
 		'arwp-jsonld'
 	);
@@ -207,6 +225,72 @@ function arwp_jsonld_register_settings() {
 	add_settings_field( 'arwp_schema_payment_accepted', __( 'Payment Methods', 'arwp' ), 'arwp_field_payment_accepted', 'arwp-jsonld', 'arwp_commerce_section' );
 	add_settings_field( 'arwp_schema_currencies_accepted', __( 'Accepted Currencies', 'arwp' ), 'arwp_field_currencies_accepted', 'arwp-jsonld', 'arwp_commerce_section' );
 	add_settings_field( 'arwp_schema_merchant_return_policy', __( 'Return Policy URL', 'arwp' ), 'arwp_field_merchant_return_policy', 'arwp-jsonld', 'arwp_commerce_section' );
+
+	add_settings_section(
+		'arwp_dining_section',
+		__( 'Dining', 'arwp' ),
+		'arwp_dining_section_cb',
+		'arwp-jsonld'
+	);
+
+	add_settings_field( 'arwp_schema_serves_cuisine', __( 'Serves Cuisine', 'arwp' ), 'arwp_field_serves_cuisine', 'arwp-jsonld', 'arwp_dining_section' );
+	add_settings_field( 'arwp_schema_accepts_reservations', __( 'Accepts Reservations', 'arwp' ), 'arwp_field_accepts_reservations', 'arwp-jsonld', 'arwp_dining_section' );
+	add_settings_field( 'arwp_schema_menu_url', __( 'Menu URL', 'arwp' ), 'arwp_field_menu_url', 'arwp-jsonld', 'arwp_dining_section' );
+
+	add_settings_section(
+		'arwp_hospitality_section',
+		__( 'Hospitality', 'arwp' ),
+		'arwp_hospitality_section_cb',
+		'arwp-jsonld'
+	);
+
+	add_settings_field( 'arwp_schema_star_rating', __( 'Star Rating', 'arwp' ), 'arwp_field_star_rating', 'arwp-jsonld', 'arwp_hospitality_section' );
+	add_settings_field( 'arwp_schema_num_rooms', __( 'Number of Rooms', 'arwp' ), 'arwp_field_num_rooms', 'arwp-jsonld', 'arwp_hospitality_section' );
+	add_settings_field( 'arwp_schema_checkin_time', __( 'Check-in Time', 'arwp' ), 'arwp_field_checkin_time', 'arwp-jsonld', 'arwp_hospitality_section' );
+	add_settings_field( 'arwp_schema_checkout_time', __( 'Check-out Time', 'arwp' ), 'arwp_field_checkout_time', 'arwp-jsonld', 'arwp_hospitality_section' );
+	add_settings_field( 'arwp_schema_pets_allowed', __( 'Pets Allowed', 'arwp' ), 'arwp_field_pets_allowed', 'arwp-jsonld', 'arwp_hospitality_section' );
+
+	add_settings_section(
+		'arwp_medical_section',
+		__( 'Medical Practice', 'arwp' ),
+		'arwp_medical_section_cb',
+		'arwp-jsonld'
+	);
+
+	add_settings_field( 'arwp_schema_medical_specialty', __( 'Medical Specialty', 'arwp' ), 'arwp_field_medical_specialty', 'arwp-jsonld', 'arwp_medical_section' );
+	add_settings_field( 'arwp_schema_available_service', __( 'Available Services', 'arwp' ), 'arwp_field_available_service', 'arwp-jsonld', 'arwp_medical_section' );
+
+	add_settings_section(
+		'arwp_education_section',
+		__( 'Education', 'arwp' ),
+		'arwp_education_section_cb',
+		'arwp-jsonld'
+	);
+
+	add_settings_field( 'arwp_schema_departments', __( 'Departments', 'arwp' ), 'arwp_field_departments', 'arwp-jsonld', 'arwp_education_section' );
+	add_settings_field( 'arwp_schema_alumni', __( 'Notable Alumni', 'arwp' ), 'arwp_field_alumni', 'arwp-jsonld', 'arwp_education_section' );
+
+	add_settings_section(
+		'arwp_civic_section',
+		__( 'Civic & Community', 'arwp' ),
+		'arwp_civic_section_cb',
+		'arwp-jsonld'
+	);
+
+	add_settings_field( 'arwp_schema_affiliation', __( 'Affiliations', 'arwp' ), 'arwp_field_affiliation', 'arwp-jsonld', 'arwp_civic_section' );
+	add_settings_field( 'arwp_schema_sport', __( 'Sport', 'arwp' ), 'arwp_field_sport', 'arwp-jsonld', 'arwp_civic_section' );
+
+	add_settings_section(
+		'arwp_custom_section',
+		__( 'Custom JSON-LD', 'arwp' ),
+		'arwp_custom_section_cb',
+		'arwp-jsonld'
+	);
+
+	add_settings_field( 'arwp_schema_custom_org', __( 'Organization Node', 'arwp' ), 'arwp_field_custom_org', 'arwp-jsonld', 'arwp_custom_section' );
+	add_settings_field( 'arwp_schema_custom_website', __( 'WebSite Node', 'arwp' ), 'arwp_field_custom_website', 'arwp-jsonld', 'arwp_custom_section' );
+	add_settings_field( 'arwp_schema_custom_content', __( 'Content Node', 'arwp' ), 'arwp_field_custom_content', 'arwp-jsonld', 'arwp_custom_section' );
+	add_settings_field( 'arwp_schema_custom_graph', __( 'Graph Nodes', 'arwp' ), 'arwp_field_custom_graph', 'arwp-jsonld', 'arwp_custom_section' );
 
 	add_settings_section(
 		'arwp_website_section',
@@ -318,19 +402,19 @@ function arwp_sanitize_other_type( $value ) {
  */
 function arwp_schema_org_categories() {
 	return array(
-		'commercial' => array(
+		'commercial'   => array(
 			'label' => __( 'Commercial, Corporate & E-Commerce', 'arwp' ),
-			'types' => array( 'Organization', 'Corporation', 'OnlineBusiness', 'Consortium' ),
+			'types' => array( 'Organization', 'LocalBusiness', 'Store', 'Corporation', 'OnlineBusiness', 'Consortium' ),
 		),
-		'food' => array(
+		'food'         => array(
 			'label' => __( 'Food & Hospitality', 'arwp' ),
 			'types' => array( 'Restaurant', 'Bakery', 'CafeOrCoffeeShop', 'BarOrPub', 'FastFoodRestaurant', 'Hotel', 'Motel', 'BedAndBreakfast' ),
 		),
-		'healthcare' => array(
+		'healthcare'   => array(
 			'label' => __( 'Healthcare & Medical', 'arwp' ),
 			'types' => array( 'Dentist', 'MedicalClinic', 'Physician', 'Optician', 'Pharmacy', 'VeterinaryCare', 'Hospital' ),
 		),
-		'home' => array(
+		'home'         => array(
 			'label' => __( 'Home, Construction & Trades', 'arwp' ),
 			'types' => array( 'GeneralContractor', 'Electrician', 'Plumber', 'HVACBusiness', 'HousePainter', 'RoofingContractor', 'Locksmith' ),
 		),
@@ -338,19 +422,19 @@ function arwp_schema_org_categories() {
 			'label' => __( 'Professional & Legal Services', 'arwp' ),
 			'types' => array( 'LegalService', 'AccountingService', 'BankOrCreditUnion', 'InsuranceAgency', 'EmploymentAgency', 'RealEstateAgent' ),
 		),
-		'beauty' => array(
+		'beauty'       => array(
 			'label' => __( 'Health, Beauty & Wellness', 'arwp' ),
 			'types' => array( 'BeautySalon', 'HairSalon', 'DaySpa', 'NailSalon', 'HealthClub' ),
 		),
-		'automotive' => array(
+		'automotive'   => array(
 			'label' => __( 'Automotive & Retail', 'arwp' ),
 			'types' => array( 'AutoRepair', 'AutoDealer', 'GasStation', 'ClothingStore', 'GroceryStore', 'HardwareStore', 'JewelryStore' ),
 		),
-		'civic' => array(
+		'civic'        => array(
 			'label' => __( 'Non-Profit, Civic & Community', 'arwp' ),
 			'types' => array( 'NGO', 'AnimalShelter', 'GovernmentOrganization', 'School', 'CollegeOrUniversity', 'Preschool', 'SportsOrganization', 'PerformingGroup', 'ReligiousOrganization' ),
 		),
-		'media' => array(
+		'media'        => array(
 			'label' => __( 'Media & Publishing', 'arwp' ),
 			'types' => array( 'NewsMediaOrganization' ),
 		),
@@ -391,6 +475,10 @@ function arwp_schema_org_group_map() {
 		}
 	}
 
+	foreach ( array( 'LocalBusiness', 'Store' ) as $type ) {
+		$map[ $type ][] = 'local_business';
+	}
+
 	foreach ( array( 'NGO', 'AnimalShelter' ) as $type ) {
 		$map[ $type ][] = 'ngo';
 	}
@@ -400,6 +488,30 @@ function arwp_schema_org_group_map() {
 
 	foreach ( array( 'OnlineBusiness', 'ClothingStore', 'GroceryStore', 'HardwareStore', 'JewelryStore' ) as $type ) {
 		$map[ $type ][] = 'commerce';
+	}
+
+	foreach ( array( 'Restaurant', 'Bakery', 'CafeOrCoffeeShop', 'BarOrPub', 'FastFoodRestaurant' ) as $type ) {
+		$map[ $type ][] = 'dining';
+	}
+
+	foreach ( array( 'Hotel', 'Motel', 'BedAndBreakfast' ) as $type ) {
+		$map[ $type ][] = 'hospitality';
+	}
+
+	foreach ( array( 'Dentist', 'MedicalClinic', 'Physician', 'Optician', 'Pharmacy', 'VeterinaryCare', 'Hospital' ) as $type ) {
+		$map[ $type ][] = 'medical';
+	}
+
+	foreach ( array( 'School', 'CollegeOrUniversity', 'Preschool' ) as $type ) {
+		$map[ $type ][] = 'education';
+	}
+
+	foreach ( array( 'GovernmentOrganization', 'ReligiousOrganization', 'SportsOrganization', 'PerformingGroup' ) as $type ) {
+		$map[ $type ][] = 'civic_community';
+	}
+
+	foreach ( array( 'School', 'CollegeOrUniversity', 'Preschool', 'GovernmentOrganization', 'ReligiousOrganization', 'SportsOrganization', 'PerformingGroup', 'NGO', 'AnimalShelter', 'NewsMediaOrganization', 'Corporation' ) as $type ) {
+		$map[ $type ][] = 'local_business';
 	}
 
 	return $map;
@@ -417,24 +529,36 @@ function arwp_schema_org_group( $type ) {
 }
 
 /**
- * Currently selected organization subtype (mapping or fallback).
+ * Currently selected organization subtypes (mapping or fallback).
  *
- * @return string
+ * Backwards-compatible: a single string stored by older versions is
+ * wrapped into a one-element array.
+ *
+ * @return array
  */
 function arwp_schema_org_type() {
 	$value = get_option( 'arwp_schema_org_type', '' );
-	return in_array( $value, arwp_schema_org_types(), true ) ? $value : 'Organization';
+
+	if ( ! is_array( $value ) ) {
+		$value = array( $value );
+	}
+
+	$types = array_values( array_intersect( $value, arwp_schema_org_types() ) );
+
+	return ! empty( $types ) ? $types : array( 'Organization' );
 }
 
 /**
- * Whitelist an organization subtype.
+ * Whitelist organization subtypes (accepts an array).
  *
- * @param string $value Raw input.
- * @return string
+ * @param string|array $value Raw input.
+ * @return array
  */
 function arwp_sanitize_org_type( $value ) {
-	$value = sanitize_text_field( $value );
-	return in_array( $value, arwp_schema_org_types(), true ) ? $value : 'Organization';
+	$values = is_array( $value ) ? $value : array( $value );
+	$types  = array_values( array_intersect( array_map( 'sanitize_text_field', $values ), arwp_schema_org_types() ) );
+
+	return ! empty( $types ) ? $types : array( 'Organization' );
 }
 
 /**
@@ -475,6 +599,36 @@ function arwp_sanitize_latitude( $value ) {
  */
 function arwp_sanitize_longitude( $value ) {
 	return arwp_sanitize_coordinate( $value, -180, 180 );
+}
+
+/**
+ * Sanitize a star rating (0 to 5, one decimal).
+ *
+ * @param string $value Raw input.
+ * @return string Empty string when invalid.
+ */
+function arwp_sanitize_rating( $value ) {
+	$value = sanitize_text_field( $value );
+
+	if ( ! is_numeric( $value ) ) {
+		return '';
+	}
+
+	$value = (float) $value;
+
+	return ( $value >= 0 && $value <= 5 ) ? (string) $value : '';
+}
+
+/**
+ * Sanitize a 24-hour time (HH:MM).
+ *
+ * @param string $value Raw input.
+ * @return string Empty string when invalid.
+ */
+function arwp_sanitize_time( $value ) {
+	$value = sanitize_text_field( $value );
+
+	return ( 1 === preg_match( '/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/', $value ) ) ? $value : '';
 }
 
 /**
@@ -713,6 +867,178 @@ function arwp_jsonld_thing_list( $value ) {
 }
 
 /**
+ * Parse a newline-separated option into typed named entities.
+ *
+ * Each line may be "Name", "Name|URL" or "URL". Entities get the given
+ *
+ * @type and, when a URL part is present, a sameAs property.
+ *
+ * @param string $value Stored or preview value.
+ * @param string $type  Schema.org @type for each entry.
+ * @return array
+ */
+function arwp_jsonld_named_entities( $value, $type ) {
+	$entities = array();
+
+	foreach ( arwp_jsonld_url_list( $value ) as $line ) {
+		$parts = array_map( 'trim', explode( '|', $line ) );
+
+		$entity = array( '@type' => $type );
+
+		if ( 2 === count( $parts ) ) {
+			$entity['name'] = $parts[0];
+
+			if ( false !== strpos( $parts[1], '://' ) ) {
+				$entity['sameAs'] = $parts[1];
+			}
+
+			$entities[] = $entity;
+			continue;
+		}
+
+		if ( false !== strpos( $parts[0], '://' ) ) {
+			$entity['sameAs'] = $parts[0];
+		} elseif ( '' !== $parts[0] ) {
+			$entity['name'] = $parts[0];
+		}
+
+		$entities[] = $entity;
+	}
+
+	return $entities;
+}
+
+/**
+ * Sanitize a Custom JSON-LD option.
+ *
+ * Each line must be "name|JSON". Comment lines (starting with #) and blank
+ * lines are allowed. Lines whose JSON fails to parse are dropped and a
+ * settings error is surfaced for the rest.
+ *
+ * @param string $value Raw input.
+ * @return string Sanitized value.
+ */
+function arwp_sanitize_custom_json( $value ) {
+	$value   = sanitize_textarea_field( $value );
+	$clean   = array();
+	$dropped = 0;
+
+	foreach ( arwp_jsonld_url_list( $value ) as $line ) {
+		$pos = strpos( $line, '|' );
+
+		if ( 0 === strpos( $line, '#' ) || false === $pos ) {
+			continue;
+		}
+
+		$json = trim( substr( $line, $pos + 1 ) );
+
+		if ( null === json_decode( $json ) ) {
+			++$dropped;
+			continue;
+		}
+
+		$clean[] = trim( substr( $line, 0, $pos ) ) . '|' . $json;
+	}
+
+	if ( $dropped > 0 ) {
+		add_settings_error(
+			'arwp_custom_json',
+			'arwp_custom_json_invalid',
+			sprintf(
+				/* translators: %d: number of skipped lines. */
+				__( 'Custom JSON-LD: %d line(s) skipped because the JSON was invalid.', 'arwp' ),
+				$dropped
+			)
+		);
+	}
+
+	return implode( "\n", $clean );
+}
+
+/**
+ * Parse a Custom JSON-LD option into name/decoded pairs.
+ *
+ * The {home} token in each JSON fragment is replaced with the home URL.
+ *
+ * @param string $value Stored or preview value.
+ * @param string $home  Home URL used to replace the {home} token.
+ * @return array List of arrays with 'name' and 'value' keys.
+ */
+function arwp_jsonld_parse_custom( $value, $home ) {
+	$pairs = array();
+
+	foreach ( arwp_jsonld_url_list( $value ) as $line ) {
+		$pos = strpos( $line, '|' );
+
+		if ( false === $pos ) {
+			continue;
+		}
+
+		$name    = trim( substr( $line, 0, $pos ) );
+		$json    = str_replace( '{home}', $home, trim( substr( $line, $pos + 1 ) ) );
+		$decoded = json_decode( $json, true );
+
+		if ( '' === $name || null === $decoded ) {
+			continue;
+		}
+
+		$pairs[] = array(
+			'name'  => $name,
+			'value' => $decoded,
+		);
+	}
+
+	return $pairs;
+}
+
+/**
+ * Merge Custom JSON-LD name/decoded pairs into a node.
+ *
+ * Repeated names collect their values into a JSON array; the first
+ * occurrence wins the array head when a later line repeats it.
+ *
+ * @param array  $node  Node to merge into.
+ * @param string $value Raw Custom JSON-LD option.
+ * @param string $home  Home URL used to replace the {home} token.
+ * @return array Merged node.
+ */
+function arwp_jsonld_apply_custom( $node, $value, $home ) {
+	foreach ( arwp_jsonld_parse_custom( $value, $home ) as $pair ) {
+		if ( isset( $node[ $pair['name'] ] ) ) {
+			if ( ! is_array( $node[ $pair['name'] ] ) ) {
+				$node[ $pair['name'] ] = array( $node[ $pair['name'] ] );
+			}
+
+			$node[ $pair['name'] ][] = $pair['value'];
+		} else {
+			$node[ $pair['name'] ] = $pair['value'];
+		}
+	}
+
+	return $node;
+}
+
+/**
+ * Build the list of extra @graph nodes from a Custom JSON-LD graph option.
+ *
+ * Each entry is a full node; repeated names are still appended as separate
+ * nodes (the name is just an identifier).
+ *
+ * @param string $value Raw Custom JSON-LD graph option.
+ * @param string $home  Home URL used to replace the {home} token.
+ * @return array
+ */
+function arwp_jsonld_custom_graph( $value, $home ) {
+	$nodes = array();
+
+	foreach ( arwp_jsonld_parse_custom( $value, $home ) as $pair ) {
+		$nodes[] = $pair['value'];
+	}
+
+	return $nodes;
+}
+
+/**
  * Build a typed @id reference object for cross-linking graph nodes.
  *
  * @param string $type Schema.org type.
@@ -848,11 +1174,26 @@ function arwp_jsonld_build_global_nodes( $values = array() ) {
 	$org_name = arwp_jsonld_value( 'arwp_schema_org_name', $values );
 	$site     = arwp_jsonld_value( 'arwp_schema_website_name', $values );
 
-	$org_type = arwp_jsonld_value( 'arwp_schema_org_type', $values );
-	$org_type = in_array( $org_type, arwp_schema_org_types(), true ) ? $org_type : 'Organization';
+	$org_types = arwp_jsonld_value( 'arwp_schema_org_type', $values );
+
+	if ( ! is_array( $org_types ) ) {
+		$org_types = array( $org_types );
+	}
+
+	$org_types = array_values( array_intersect( $org_types, arwp_schema_org_types() ) );
+
+	if ( empty( $org_types ) ) {
+		$org_types = array( 'Organization' );
+	}
+
+	$org_groups = array();
+
+	foreach ( $org_types as $org_type ) {
+		$org_groups = array_merge( $org_groups, arwp_schema_org_group( $org_type ) );
+	}
 
 	$organization = array(
-		'@type' => $org_type,
+		'@type' => 1 === count( $org_types ) ? $org_types[0] : $org_types,
 		'@id'   => $home . '#organization',
 		'name'  => '' !== $org_name ? $org_name : get_bloginfo( 'name' ),
 		'url'   => $home,
@@ -936,7 +1277,7 @@ function arwp_jsonld_build_global_nodes( $values = array() ) {
 		}
 	}
 
-	if ( in_array( 'local_business', arwp_schema_org_group( $org_type ), true ) ) {
+	if ( in_array( 'local_business', $org_groups, true ) ) {
 		$address = array();
 
 		$address_fields = array(
@@ -993,7 +1334,7 @@ function arwp_jsonld_build_global_nodes( $values = array() ) {
 		}
 	}
 
-	if ( in_array( 'ngo', arwp_schema_org_group( $org_type ), true ) ) {
+	if ( in_array( 'ngo', $org_groups, true ) ) {
 		$nonprofit_status = arwp_jsonld_value( 'arwp_schema_nonprofit_status', $values );
 
 		if ( '' !== $nonprofit_status ) {
@@ -1001,7 +1342,7 @@ function arwp_jsonld_build_global_nodes( $values = array() ) {
 		}
 	}
 
-	if ( in_array( 'news_media', arwp_schema_org_group( $org_type ), true ) ) {
+	if ( in_array( 'news_media', $org_groups, true ) ) {
 		$policy_fields = array(
 			'publishingPrinciples' => 'arwp_schema_publishing_principles',
 			'ethicsPolicy'         => 'arwp_schema_ethics_policy',
@@ -1018,7 +1359,7 @@ function arwp_jsonld_build_global_nodes( $values = array() ) {
 		}
 	}
 
-	if ( in_array( 'corporation', arwp_schema_org_group( $org_type ), true ) ) {
+	if ( in_array( 'corporation', $org_groups, true ) ) {
 		$ticker = arwp_jsonld_value( 'arwp_schema_ticker_symbol', $values );
 
 		if ( '' !== $ticker ) {
@@ -1026,7 +1367,7 @@ function arwp_jsonld_build_global_nodes( $values = array() ) {
 		}
 	}
 
-	if ( in_array( 'commerce', arwp_schema_org_group( $org_type ), true ) ) {
+	if ( in_array( 'commerce', $org_groups, true ) ) {
 		$payments = arwp_jsonld_comma_list( arwp_jsonld_value( 'arwp_schema_payment_accepted', $values ) );
 		if ( ! empty( $payments ) ) {
 			$organization['paymentAccepted'] = $payments;
@@ -1040,6 +1381,88 @@ function arwp_jsonld_build_global_nodes( $values = array() ) {
 		$return_policy = arwp_jsonld_value( 'arwp_schema_merchant_return_policy', $values );
 		if ( '' !== $return_policy ) {
 			$organization['hasMerchantReturnPolicy'] = $return_policy;
+		}
+	}
+
+	if ( in_array( 'dining', $org_groups, true ) ) {
+		$cuisines = arwp_jsonld_comma_list( arwp_jsonld_value( 'arwp_schema_serves_cuisine', $values ) );
+		if ( ! empty( $cuisines ) ) {
+			$organization['servesCuisine'] = $cuisines;
+		}
+
+		if ( '1' === (string) arwp_jsonld_value( 'arwp_schema_accepts_reservations', $values ) ) {
+			$organization['acceptsReservations'] = true;
+		}
+
+		$menu_url = arwp_jsonld_value( 'arwp_schema_menu_url', $values );
+		if ( '' !== $menu_url ) {
+			$organization['hasMenu'] = $menu_url;
+		}
+	}
+
+	if ( in_array( 'hospitality', $org_groups, true ) ) {
+		$rating = arwp_jsonld_value( 'arwp_schema_star_rating', $values );
+		if ( is_numeric( $rating ) ) {
+			$organization['starRating'] = array(
+				'@type'       => 'AggregateRating',
+				'ratingValue' => (float) $rating,
+				'bestRating'  => 5,
+			);
+		}
+
+		$rooms = arwp_jsonld_value( 'arwp_schema_num_rooms', $values );
+		if ( '' !== $rooms ) {
+			$organization['numberOfRooms'] = (int) $rooms;
+		}
+
+		$checkin = arwp_jsonld_value( 'arwp_schema_checkin_time', $values );
+		if ( '' !== $checkin ) {
+			$organization['checkinTime'] = $checkin;
+		}
+
+		$checkout = arwp_jsonld_value( 'arwp_schema_checkout_time', $values );
+		if ( '' !== $checkout ) {
+			$organization['checkoutTime'] = $checkout;
+		}
+
+		if ( '1' === (string) arwp_jsonld_value( 'arwp_schema_pets_allowed', $values ) ) {
+			$organization['petsAllowed'] = true;
+		}
+	}
+
+	if ( in_array( 'medical', $org_groups, true ) ) {
+		$specialty = arwp_jsonld_comma_list( arwp_jsonld_value( 'arwp_schema_medical_specialty', $values ) );
+		if ( ! empty( $specialty ) ) {
+			$organization['medicalSpecialty'] = $specialty;
+		}
+
+		$services = arwp_jsonld_named_entities( arwp_jsonld_value( 'arwp_schema_available_service', $values ), 'Service' );
+		if ( ! empty( $services ) ) {
+			$organization['availableService'] = $services;
+		}
+	}
+
+	if ( in_array( 'education', $org_groups, true ) ) {
+		$departments = arwp_jsonld_named_entities( arwp_jsonld_value( 'arwp_schema_departments', $values ), 'Organization' );
+		if ( ! empty( $departments ) ) {
+			$organization['department'] = $departments;
+		}
+
+		$alumni = arwp_jsonld_named_entities( arwp_jsonld_value( 'arwp_schema_alumni', $values ), 'Person' );
+		if ( ! empty( $alumni ) ) {
+			$organization['alumni'] = $alumni;
+		}
+	}
+
+	if ( in_array( 'civic_community', $org_groups, true ) ) {
+		$affiliations = arwp_jsonld_named_entities( arwp_jsonld_value( 'arwp_schema_affiliation', $values ), 'Organization' );
+		if ( ! empty( $affiliations ) ) {
+			$organization['affiliation'] = $affiliations;
+		}
+
+		$sport = arwp_jsonld_value( 'arwp_schema_sport', $values );
+		if ( '' !== $sport ) {
+			$organization['sport'] = $sport;
 		}
 	}
 
@@ -1067,6 +1490,9 @@ function arwp_jsonld_build_global_nodes( $values = array() ) {
 		$website['alternateName'] = $alternate_name;
 	}
 
+	$organization = arwp_jsonld_apply_custom( $organization, arwp_jsonld_value( 'arwp_schema_custom_org', $values ), $home );
+	$website      = arwp_jsonld_apply_custom( $website, arwp_jsonld_value( 'arwp_schema_custom_website', $values ), $home );
+
 	return array( apply_filters( 'agent_ready_organization_node', $organization ), $website );
 }
 
@@ -1086,7 +1512,7 @@ function arwp_jsonld_build_page_node( $values = array() ) {
 
 	$url = $home . 'example-blog-post/';
 
-	return array(
+	$node = array(
 		'@type'     => $type,
 		'@id'       => $url . '#webpage',
 		'headline'  => __( 'Example Blog Post', 'arwp' ),
@@ -1094,6 +1520,8 @@ function arwp_jsonld_build_page_node( $values = array() ) {
 		'isPartOf'  => arwp_jsonld_ref( 'WebSite', $home . '#website' ),
 		'publisher' => arwp_jsonld_ref( 'Organization', $home . '#organization' ),
 	);
+
+	return arwp_jsonld_apply_custom( $node, arwp_jsonld_value( 'arwp_schema_custom_content', $values ), $home );
 }
 
 /**
@@ -1125,7 +1553,7 @@ function arwp_jsonld_resolve_content_type( $post ) {
 		return 'WebPage';
 	}
 
-	$custom = get_post_meta( $post->ID, '_arwp_schema_custom_type', true );
+	$custom  = get_post_meta( $post->ID, '_arwp_schema_custom_type', true );
 	$allowed = array_diff( arwp_post_meta_types( $post->post_type ), array( 'default' ) );
 
 	if ( in_array( $custom, $allowed, true ) ) {
@@ -1248,7 +1676,7 @@ function arwp_jsonld_build_content_node( $post ) {
 		}
 	}
 
-	return $node;
+	return arwp_jsonld_apply_custom( $node, get_option( 'arwp_schema_custom_content', '' ), home_url( '/' ) );
 }
 
 /**
@@ -1362,13 +1790,13 @@ function arwp_jsonld_build_collection_node() {
 		'publisher'  => arwp_jsonld_ref( 'Organization', $home . '#organization' ),
 	);
 
-	$items  = array();
-	$posts  = $GLOBALS['wp_query']->posts;
-	$count  = 0;
+	$items = array();
+	$posts = $GLOBALS['wp_query']->posts;
+	$count = 0;
 
 	if ( is_array( $posts ) ) {
 		foreach ( $posts as $post ) {
-			$count++;
+			++$count;
 
 			$items[] = array(
 				'@type'    => 'ListItem',
@@ -1542,10 +1970,18 @@ function arwp_jsonld_build_graph() {
 		$nodes[] = $breadcrumb;
 	}
 
-	return apply_filters( 'agent_ready_json_ld_graph', array(
-		'@context' => 'https://schema.org',
-		'@graph'   => $nodes,
-	) );
+	$custom_graph = arwp_jsonld_custom_graph( get_option( 'arwp_schema_custom_graph', '' ), home_url( '/' ) );
+	if ( ! empty( $custom_graph ) ) {
+		$nodes = array_merge( $nodes, $custom_graph );
+	}
+
+	return apply_filters(
+		'agent_ready_json_ld_graph',
+		array(
+			'@context' => 'https://schema.org',
+			'@graph'   => $nodes,
+		)
+	);
 }
 
 /**
@@ -1594,6 +2030,7 @@ function arwp_jsonld_render_output() {
 		return;
 	}
 
+	// phpcs:ignore WordPress.Security.EscapeOutput -- JSON is hex-escaped by wp_json_encode() (JSON_HEX_TAG etc.).
 	echo '<script type="application/ld+json">' . arwp_jsonld_graph_json( $schema ) . '</script>';
 }
 add_action( 'wp_head', 'arwp_jsonld_render_output', 5 );
@@ -1763,12 +2200,31 @@ function arwp_ajax_preview_jsonld() {
 		'arwp_schema_default_post_type'      => 'arwp_sanitize_post_type',
 		'arwp_schema_default_page_type'      => 'arwp_sanitize_page_type',
 		'arwp_schema_default_other_type'     => 'arwp_sanitize_other_type',
+		'arwp_schema_serves_cuisine'         => 'sanitize_text_field',
+		'arwp_schema_accepts_reservations'   => 'absint',
+		'arwp_schema_menu_url'               => 'esc_url_raw',
+		'arwp_schema_star_rating'            => 'arwp_sanitize_rating',
+		'arwp_schema_num_rooms'              => 'absint',
+		'arwp_schema_checkin_time'           => 'arwp_sanitize_time',
+		'arwp_schema_checkout_time'          => 'arwp_sanitize_time',
+		'arwp_schema_pets_allowed'           => 'absint',
+		'arwp_schema_medical_specialty'      => 'sanitize_text_field',
+		'arwp_schema_available_service'      => 'arwp_sanitize_text_list',
+		'arwp_schema_departments'            => 'arwp_sanitize_text_list',
+		'arwp_schema_alumni'                 => 'arwp_sanitize_text_list',
+		'arwp_schema_affiliation'            => 'arwp_sanitize_text_list',
+		'arwp_schema_sport'                  => 'sanitize_text_field',
+		'arwp_schema_custom_org'             => 'arwp_sanitize_custom_json',
+		'arwp_schema_custom_website'         => 'arwp_sanitize_custom_json',
+		'arwp_schema_custom_content'         => 'arwp_sanitize_custom_json',
+		'arwp_schema_custom_graph'           => 'arwp_sanitize_custom_json',
 	);
 
 	$values = array();
 
 	foreach ( $fields as $name => $callback ) {
 		if ( isset( $_POST[ $name ] ) ) {
+			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput -- sanitized by each field's arwp_sanitize_* callback.
 			$values[ $name ] = call_user_func( $callback, wp_unslash( $_POST[ $name ] ) );
 		}
 	}
@@ -1781,16 +2237,27 @@ function arwp_ajax_preview_jsonld() {
 		),
 	);
 
+	$custom_graph = arwp_jsonld_custom_graph( arwp_jsonld_value( 'arwp_schema_custom_graph', $values ), home_url( '/' ) );
+	if ( ! empty( $custom_graph ) ) {
+		$schema['@graph'] = array_merge( $schema['@graph'], $custom_graph );
+	}
+
 	$schema = apply_filters( 'agent_ready_json_ld_graph', $schema );
 
 	wp_send_json_success( array( 'schema' => $schema ) );
 }
 add_action( 'wp_ajax_arwp_preview_jsonld', 'arwp_ajax_preview_jsonld' );
 
+/**
+ * Render the Organization section intro paragraph.
+ */
 function arwp_jsonld_section_cb() {
 	echo '<p>' . esc_html__( 'Organization identity used in the @graph structured data.', 'arwp' ) . '</p>';
 }
 
+/**
+ * Render the organization name field.
+ */
 function arwp_field_org_name() {
 	arwp_text_field(
 		'arwp_schema_org_name',
@@ -1801,6 +2268,9 @@ function arwp_field_org_name() {
 	);
 }
 
+/**
+ * Render the logo URL field with a media-library picker button.
+ */
 function arwp_field_org_logo() {
 	$value = get_option( 'arwp_schema_org_logo', '' );
 	?>
@@ -1820,6 +2290,9 @@ function arwp_field_org_logo() {
 	);
 }
 
+/**
+ * Render the organization description field.
+ */
 function arwp_field_org_description() {
 	arwp_textarea_field(
 		'arwp_schema_org_description',
@@ -1828,6 +2301,9 @@ function arwp_field_org_description() {
 	);
 }
 
+/**
+ * Render the sameAs social profile links field.
+ */
 function arwp_field_same_as() {
 	arwp_textarea_field(
 		'arwp_schema_same_as',
@@ -1837,6 +2313,9 @@ function arwp_field_same_as() {
 	);
 }
 
+/**
+ * Render the knowsAbout subjects field.
+ */
 function arwp_field_knows_about() {
 	arwp_textarea_field(
 		'arwp_schema_knows_about',
@@ -1845,33 +2324,65 @@ function arwp_field_knows_about() {
 	);
 }
 
+/**
+ * Render the Organization type section intro paragraph.
+ */
 function arwp_org_type_section_cb() {
-	echo '<p>' . esc_html__( 'Pick the closest Schema.org type for your organization. Local business, non-profit, media and e-commerce types reveal extra fields below.', 'arwp' ) . '</p>';
+	echo '<p>' . esc_html__( 'Pick one or more Schema.org types for your organization. Local business, non-profit, media and e-commerce types reveal extra fields below.', 'arwp' ) . '</p>';
 }
 
+/**
+ * Render the multi-select organization type picker.
+ */
 function arwp_field_org_type() {
 	$current = arwp_schema_org_type();
 	$groups  = arwp_schema_org_group_map();
 	?>
-	<select name="arwp_schema_org_type" id="arwp-schema-org-type">
-		<?php foreach ( arwp_schema_org_categories() as $category ) : ?>
-			<optgroup label="<?php echo esc_attr( $category['label'] ); ?>">
-				<?php foreach ( $category['types'] as $type ) : ?>
-					<option
-						value="<?php echo esc_attr( $type ); ?>"
-						data-groups="<?php echo esc_attr( implode( ' ', isset( $groups[ $type ] ) ? $groups[ $type ] : array() ) ); ?>"
-						<?php selected( $current, $type ); ?>
-					>
-						<?php echo esc_html( $type ); ?>
-					</option>
-				<?php endforeach; ?>
-			</optgroup>
-		<?php endforeach; ?>
-	</select>
+	<div class="arwp-org-type-picker" id="arwp-org-type-picker">
+		<div class="arwp-org-type-tokens" id="arwp-org-type-tokens">
+			<?php foreach ( $current as $type ) : ?>
+				<?php
+				$type_groups = isset( $groups[ $type ] ) ? implode( ' ', $groups[ $type ] ) : '';
+				?>
+				<span class="arwp-org-type-token">
+					<?php echo esc_html( $type ); ?>
+					<input type="hidden" name="arwp_schema_org_type[]" value="<?php echo esc_attr( $type ); ?>" data-groups="<?php echo esc_attr( $type_groups ); ?>">
+					<button type="button" class="arwp-org-type-remove" aria-label="<?php /* translators: %s: organization type name. */ echo esc_attr( sprintf( __( 'Remove %s', 'arwp' ), $type ) ); ?>">&times;</button>
+				</span>
+			<?php endforeach; ?>
+		</div>
+		<input
+			type="text"
+			id="arwp-org-type-search"
+			class="regular-text"
+			placeholder="<?php esc_attr_e( 'Search and add organization types…', 'arwp' ); ?>"
+			autocomplete="off"
+			aria-label="<?php esc_attr_e( 'Search organization types', 'arwp' ); ?>"
+			data-no-match="<?php esc_attr_e( 'No matching types', 'arwp' ); ?>"
+		>
+		<div class="arwp-org-type-list" id="arwp-org-type-list" hidden></div>
+		<select id="arwp-org-type-source" hidden>
+			<?php foreach ( arwp_schema_org_categories() as $category ) : ?>
+				<optgroup label="<?php echo esc_attr( $category['label'] ); ?>">
+					<?php foreach ( $category['types'] as $type ) : ?>
+						<option
+							value="<?php echo esc_attr( $type ); ?>"
+							data-groups="<?php echo esc_attr( implode( ' ', isset( $groups[ $type ] ) ? $groups[ $type ] : array() ) ); ?>"
+						>
+							<?php echo esc_html( $type ); ?>
+						</option>
+					<?php endforeach; ?>
+				</optgroup>
+			<?php endforeach; ?>
+		</select>
+	</div>
 	<?php
-	arwp_field_description( __( 'The Schema.org type emitted as the Organization node @type. Over 50 subtypes across commercial, local business, non-profit and media categories.', 'arwp' ), 'https://schema.org/Organization' );
+	arwp_field_description( __( 'One or more Schema.org types emitted as the Organization node @type (e.g. ClothingStore + LocalBusiness). Search, pick, and remove chips. Each type reveals the settings sections that apply to it.', 'arwp' ), 'https://schema.org/Organization' );
 }
 
+/**
+ * Render the legal name field.
+ */
 function arwp_field_org_legal_name() {
 	arwp_text_field(
 		'arwp_schema_org_legal_name',
@@ -1882,6 +2393,9 @@ function arwp_field_org_legal_name() {
 	);
 }
 
+/**
+ * Render the slogan field.
+ */
 function arwp_field_org_slogan() {
 	arwp_text_field(
 		'arwp_schema_org_slogan',
@@ -1892,10 +2406,16 @@ function arwp_field_org_slogan() {
 	);
 }
 
+/**
+ * Render the contact point section intro paragraph.
+ */
 function arwp_contact_section_cb() {
 	echo '<p>' . esc_html__( 'A structured public contact channel emitted as a contactPoint on the Organization node.', 'arwp' ) . '</p>';
 }
 
+/**
+ * Render the contact telephone field.
+ */
 function arwp_field_contact_telephone() {
 	arwp_text_field(
 		'arwp_schema_contact_telephone',
@@ -1906,6 +2426,9 @@ function arwp_field_contact_telephone() {
 	);
 }
 
+/**
+ * Render the contact email field.
+ */
 function arwp_field_contact_email() {
 	arwp_text_field(
 		'arwp_schema_contact_email',
@@ -1916,6 +2439,9 @@ function arwp_field_contact_email() {
 	);
 }
 
+/**
+ * Render the contact type field.
+ */
 function arwp_field_contact_type() {
 	arwp_text_field(
 		'arwp_schema_contact_type',
@@ -1926,6 +2452,9 @@ function arwp_field_contact_type() {
 	);
 }
 
+/**
+ * Render the available language field.
+ */
 function arwp_field_contact_languages() {
 	arwp_text_field(
 		'arwp_schema_contact_languages',
@@ -1936,10 +2465,16 @@ function arwp_field_contact_languages() {
 	);
 }
 
+/**
+ * Render the legal identity section intro paragraph.
+ */
 function arwp_legal_section_cb() {
 	echo '<p>' . esc_html__( 'Legal identity and provenance signals used by AI agents to assess legitimacy and maturity.', 'arwp' ) . '</p>';
 }
 
+/**
+ * Render the tax ID field.
+ */
 function arwp_field_org_tax_id() {
 	arwp_text_field(
 		'arwp_schema_org_tax_id',
@@ -1950,6 +2485,9 @@ function arwp_field_org_tax_id() {
 	);
 }
 
+/**
+ * Render the VAT ID field.
+ */
 function arwp_field_org_vat_id() {
 	arwp_text_field(
 		'arwp_schema_org_vat_id',
@@ -1960,6 +2498,9 @@ function arwp_field_org_vat_id() {
 	);
 }
 
+/**
+ * Render the founding date field.
+ */
 function arwp_field_founding_date() {
 	arwp_text_field(
 		'arwp_schema_founding_date',
@@ -1970,6 +2511,9 @@ function arwp_field_founding_date() {
 	);
 }
 
+/**
+ * Render the founder field.
+ */
 function arwp_field_org_founder() {
 	arwp_text_field(
 		'arwp_schema_org_founder',
@@ -1980,6 +2524,9 @@ function arwp_field_org_founder() {
 	);
 }
 
+/**
+ * Render the area served field.
+ */
 function arwp_field_area_served() {
 	arwp_textarea_field(
 		'arwp_schema_area_served',
@@ -1988,10 +2535,16 @@ function arwp_field_area_served() {
 	);
 }
 
+/**
+ * Render the location section intro paragraph.
+ */
 function arwp_local_section_cb() {
-	echo '<p>' . esc_html__( 'Physical location metadata for local business types. Emitted as address, geo, priceRange and openingHoursSpecification on the Organization node.', 'arwp' ) . '</p>';
+	echo '<p>' . esc_html__( 'Physical location metadata for organizations with a physical presence. Emitted as address, geo, priceRange and openingHoursSpecification on the Organization node.', 'arwp' ) . '</p>';
 }
 
+/**
+ * Render the street address field.
+ */
 function arwp_field_address_street() {
 	arwp_text_field(
 		'arwp_schema_address_street',
@@ -2002,6 +2555,9 @@ function arwp_field_address_street() {
 	);
 }
 
+/**
+ * Render the address locality field.
+ */
 function arwp_field_address_locality() {
 	arwp_text_field(
 		'arwp_schema_address_locality',
@@ -2012,6 +2568,9 @@ function arwp_field_address_locality() {
 	);
 }
 
+/**
+ * Render the address region field.
+ */
 function arwp_field_address_region() {
 	arwp_text_field(
 		'arwp_schema_address_region',
@@ -2022,6 +2581,9 @@ function arwp_field_address_region() {
 	);
 }
 
+/**
+ * Render the postal code field.
+ */
 function arwp_field_address_postal() {
 	arwp_text_field(
 		'arwp_schema_address_postal',
@@ -2032,6 +2594,9 @@ function arwp_field_address_postal() {
 	);
 }
 
+/**
+ * Render the country code field.
+ */
 function arwp_field_address_country() {
 	arwp_text_field(
 		'arwp_schema_address_country',
@@ -2042,6 +2607,9 @@ function arwp_field_address_country() {
 	);
 }
 
+/**
+ * Render the latitude field.
+ */
 function arwp_field_geo_lat() {
 	arwp_text_field(
 		'arwp_schema_geo_lat',
@@ -2052,6 +2620,9 @@ function arwp_field_geo_lat() {
 	);
 }
 
+/**
+ * Render the longitude field.
+ */
 function arwp_field_geo_lng() {
 	arwp_text_field(
 		'arwp_schema_geo_lng',
@@ -2062,6 +2633,9 @@ function arwp_field_geo_lng() {
 	);
 }
 
+/**
+ * Render the price range field.
+ */
 function arwp_field_price_range() {
 	arwp_text_field(
 		'arwp_schema_price_range',
@@ -2072,6 +2646,9 @@ function arwp_field_price_range() {
 	);
 }
 
+/**
+ * Render the opening hours field.
+ */
 function arwp_field_opening_hours() {
 	arwp_textarea_field(
 		'arwp_schema_opening_hours',
@@ -2080,10 +2657,16 @@ function arwp_field_opening_hours() {
 	);
 }
 
+/**
+ * Render the non-profit section intro paragraph.
+ */
 function arwp_ngo_section_cb() {
 	echo '<p>' . esc_html__( 'Tax-status metadata for non-profit organization types. Emitted as nonprofitStatus on the Organization node.', 'arwp' ) . '</p>';
 }
 
+/**
+ * Render the nonprofit status field.
+ */
 function arwp_field_nonprofit_status() {
 	arwp_text_field(
 		'arwp_schema_nonprofit_status',
@@ -2094,10 +2677,16 @@ function arwp_field_nonprofit_status() {
 	);
 }
 
+/**
+ * Render the news media section intro paragraph.
+ */
 function arwp_news_section_cb() {
 	echo '<p>' . esc_html__( 'Policy URLs for media organizations, used by AI agents and search engines to evaluate publishing standards. Emitted on the Organization node.', 'arwp' ) . '</p>';
 }
 
+/**
+ * Render the publishing principles URL field.
+ */
 function arwp_field_publishing_principles() {
 	arwp_text_field(
 		'arwp_schema_publishing_principles',
@@ -2108,6 +2697,9 @@ function arwp_field_publishing_principles() {
 	);
 }
 
+/**
+ * Render the ethics policy URL field.
+ */
 function arwp_field_ethics_policy() {
 	arwp_text_field(
 		'arwp_schema_ethics_policy',
@@ -2118,6 +2710,9 @@ function arwp_field_ethics_policy() {
 	);
 }
 
+/**
+ * Render the corrections policy URL field.
+ */
 function arwp_field_corrections_policy() {
 	arwp_text_field(
 		'arwp_schema_corrections_policy',
@@ -2128,6 +2723,9 @@ function arwp_field_corrections_policy() {
 	);
 }
 
+/**
+ * Render the diversity policy URL field.
+ */
 function arwp_field_diversity_policy() {
 	arwp_text_field(
 		'arwp_schema_diversity_policy',
@@ -2138,10 +2736,16 @@ function arwp_field_diversity_policy() {
 	);
 }
 
+/**
+ * Render the corporation section intro paragraph.
+ */
 function arwp_corporate_section_cb() {
 	echo '<p>' . esc_html__( 'Public-company identifier. Emitted as tickerSymbol on the Organization node.', 'arwp' ) . '</p>';
 }
 
+/**
+ * Render the ticker symbol field.
+ */
 function arwp_field_ticker_symbol() {
 	arwp_text_field(
 		'arwp_schema_ticker_symbol',
@@ -2152,10 +2756,16 @@ function arwp_field_ticker_symbol() {
 	);
 }
 
+/**
+ * Render the commerce section intro paragraph.
+ */
 function arwp_commerce_section_cb() {
 	echo '<p>' . esc_html__( 'Online store acceptance metadata. Emitted as paymentAccepted, currenciesAccepted and hasMerchantReturnPolicy on the Organization node.', 'arwp' ) . '</p>';
 }
 
+/**
+ * Render the accepted payments field.
+ */
 function arwp_field_payment_accepted() {
 	arwp_text_field(
 		'arwp_schema_payment_accepted',
@@ -2166,6 +2776,9 @@ function arwp_field_payment_accepted() {
 	);
 }
 
+/**
+ * Render the accepted currencies field.
+ */
 function arwp_field_currencies_accepted() {
 	arwp_text_field(
 		'arwp_schema_currencies_accepted',
@@ -2176,6 +2789,9 @@ function arwp_field_currencies_accepted() {
 	);
 }
 
+/**
+ * Render the return policy URL field.
+ */
 function arwp_field_merchant_return_policy() {
 	arwp_text_field(
 		'arwp_schema_merchant_return_policy',
@@ -2186,10 +2802,296 @@ function arwp_field_merchant_return_policy() {
 	);
 }
 
+/**
+ * Render a hidden-0 checkbox toggle.
+ *
+ * @param string $name        Option name.
+ * @param string $label       Label shown next to the checkbox.
+ * @param string $description Help text below the toggle.
+ * @param string $learn_more  Optional documentation URL appended to the description.
+ */
+function arwp_jsonld_checkbox_field( $name, $label, $description = '', $learn_more = '' ) {
+	$checked = get_option( $name, 0 );
+	?>
+	<label for="<?php echo esc_attr( $name ); ?>">
+		<input type="hidden" name="<?php echo esc_attr( $name ); ?>" value="0">
+		<input type="checkbox" id="<?php echo esc_attr( $name ); ?>" name="<?php echo esc_attr( $name ); ?>" value="1" <?php checked( $checked, 1 ); ?>>
+		<?php echo esc_html( $label ); ?>
+	</label>
+	<?php
+	if ( '' !== $description ) {
+		arwp_field_description( $description, $learn_more );
+	}
+}
+
+/**
+ * Render the dining section intro paragraph.
+ */
+function arwp_dining_section_cb() {
+	echo '<p>' . esc_html__( 'Menu and reservation metadata for food-serving business types. Emitted as servesCuisine, acceptsReservations and hasMenu on the Organization node.', 'arwp' ) . '</p>';
+}
+
+/**
+ * Render the cuisines served field.
+ */
+function arwp_field_serves_cuisine() {
+	arwp_text_field(
+		'arwp_schema_serves_cuisine',
+		'Italian, Seafood',
+		'text',
+		__( 'Comma-separated list of cuisines served, e.g. "Italian, Seafood". Shown as servesCuisine.', 'arwp' ),
+		'https://schema.org/servesCuisine'
+	);
+}
+
+/**
+ * Render the accepts reservations toggle.
+ */
+function arwp_field_accepts_reservations() {
+	arwp_jsonld_checkbox_field(
+		'arwp_schema_accepts_reservations',
+		__( 'This business accepts table reservations.', 'arwp' ),
+		__( 'When enabled, the Organization node is marked as accepting reservations.', 'arwp' ),
+		'https://schema.org/acceptsReservations'
+	);
+}
+
+/**
+ * Render the menu URL field.
+ */
+function arwp_field_menu_url() {
+	arwp_text_field(
+		'arwp_schema_menu_url',
+		'https://example.com/menu',
+		'url',
+		__( 'URL to your online menu. Shown as hasMenu.', 'arwp' ),
+		'https://schema.org/hasMenu'
+	);
+}
+
+/**
+ * Render the hospitality section intro paragraph.
+ */
+function arwp_hospitality_section_cb() {
+	echo '<p>' . esc_html__( 'Accommodation metadata for lodging business types. Emitted as starRating, numberOfRooms, checkinTime, checkoutTime and petsAllowed on the Organization node.', 'arwp' ) . '</p>';
+}
+
+/**
+ * Render the star rating field.
+ */
+function arwp_field_star_rating() {
+	arwp_text_field(
+		'arwp_schema_star_rating',
+		'4',
+		'text',
+		__( 'Average guest rating from 0 to 5 (one decimal), e.g. 4 or 4.5. Shown as starRating (AggregateRating).', 'arwp' ),
+		'https://schema.org/starRating'
+	);
+}
+
+/**
+ * Render the number of rooms field.
+ */
+function arwp_field_num_rooms() {
+	arwp_text_field(
+		'arwp_schema_num_rooms',
+		'25',
+		'text',
+		__( 'Total number of rooms available. Shown as numberOfRooms.', 'arwp' ),
+		'https://schema.org/numberOfRooms'
+	);
+}
+
+/**
+ * Render the check-in time field.
+ */
+function arwp_field_checkin_time() {
+	arwp_text_field(
+		'arwp_schema_checkin_time',
+		'15:00',
+		'text',
+		__( 'Standard check-in time in 24-hour HH:MM format, e.g. 15:00. Shown as checkinTime.', 'arwp' ),
+		'https://schema.org/checkinTime'
+	);
+}
+
+/**
+ * Render the check-out time field.
+ */
+function arwp_field_checkout_time() {
+	arwp_text_field(
+		'arwp_schema_checkout_time',
+		'11:00',
+		'text',
+		__( 'Standard check-out time in 24-hour HH:MM format, e.g. 11:00. Shown as checkoutTime.', 'arwp' ),
+		'https://schema.org/checkoutTime'
+	);
+}
+
+/**
+ * Render the pets allowed toggle.
+ */
+function arwp_field_pets_allowed() {
+	arwp_jsonld_checkbox_field(
+		'arwp_schema_pets_allowed',
+		__( 'This property allows pets.', 'arwp' ),
+		__( 'When enabled, the Organization node is marked as pet-friendly.', 'arwp' ),
+		'https://schema.org/petsAllowed'
+	);
+}
+
+/**
+ * Render the medical section intro paragraph.
+ */
+function arwp_medical_section_cb() {
+	echo '<p>' . esc_html__( 'Practice metadata for healthcare organization types. Emitted as medicalSpecialty and availableService on the Organization node.', 'arwp' ) . '</p>';
+}
+
+/**
+ * Render the medical specialty field.
+ */
+function arwp_field_medical_specialty() {
+	arwp_text_field(
+		'arwp_schema_medical_specialty',
+		'Dentistry',
+		'text',
+		__( 'Comma-separated list of specialties, e.g. "Dentistry, Orthodontics". Shown as medicalSpecialty.', 'arwp' ),
+		'https://schema.org/medicalSpecialty'
+	);
+}
+
+/**
+ * Render the available services field.
+ */
+function arwp_field_available_service() {
+	arwp_textarea_field(
+		'arwp_schema_available_service',
+		__( 'One service per line. Format: Name or Name|URL, e.g. "Teeth Whitening" or "Orthodontics|https://example.com/orthodontics". Shown as availableService.', 'arwp' ),
+		'https://schema.org/availableService'
+	);
+}
+
+/**
+ * Render the education section intro paragraph.
+ */
+function arwp_education_section_cb() {
+	echo '<p>' . esc_html__( 'Metadata for educational organization types. Emitted as department and alumni on the Organization node.', 'arwp' ) . '</p>';
+}
+
+/**
+ * Render the departments field.
+ */
+function arwp_field_departments() {
+	arwp_textarea_field(
+		'arwp_schema_departments',
+		__( 'One department per line. Format: Name or Name|URL, e.g. "Faculty of Engineering" or "Faculty of Medicine|https://example.com/medicine". Shown as department.', 'arwp' ),
+		'https://schema.org/department'
+	);
+}
+
+/**
+ * Render the alumni field.
+ */
+function arwp_field_alumni() {
+	arwp_textarea_field(
+		'arwp_schema_alumni',
+		__( 'One notable alumni per line. Format: Name or Name|URL, e.g. "Ada Lovelace". Shown as alumni.', 'arwp' ),
+		'https://schema.org/alumni'
+	);
+}
+
+/**
+ * Render the civic and community section intro paragraph.
+ */
+function arwp_civic_section_cb() {
+	echo '<p>' . esc_html__( 'Metadata for civic and community organization types. Emitted as affiliation and sport on the Organization node.', 'arwp' ) . '</p>';
+}
+
+/**
+ * Render the affiliations field.
+ */
+function arwp_field_affiliation() {
+	arwp_textarea_field(
+		'arwp_schema_affiliation',
+		__( 'One affiliation per line. Format: Name or Name|URL, e.g. "Regional Youth League" or "National Federation|https://example.com/federation". Shown as affiliation.', 'arwp' ),
+		'https://schema.org/affiliation'
+	);
+}
+
+/**
+ * Render the sport field.
+ */
+function arwp_field_sport() {
+	arwp_text_field(
+		'arwp_schema_sport',
+		'Football',
+		'text',
+		__( 'Primary sport practiced, e.g. "Football". Shown as sport.', 'arwp' ),
+		'https://schema.org/sport'
+	);
+}
+
+/**
+ * Render the custom JSON-LD section intro paragraph.
+ */
+function arwp_custom_section_cb() {
+	echo '<p>' . esc_html__( 'Add your own Schema.org properties when the built-in fields are not enough. Each line is name|JSON — the name becomes a property key on the target node (or, for Graph Nodes, an identifier) and the JSON is merged in verbatim. Use {home} for your home URL, prefix a line with # to comment it out.', 'arwp' ) . '</p>';
+}
+
+/**
+ * Render the custom Organization properties field.
+ */
+function arwp_field_custom_org() {
+	arwp_textarea_field(
+		'arwp_schema_custom_org',
+		__( 'One property per line, e.g. "award|[\'Best Pizza 2025\', \'Top 10\']" or "slogan|\'Fresh since 1990\'". Merged into the Organization node before the agent_ready_organization_node filter.', 'arwp' ),
+		'https://schema.org/Organization'
+	);
+}
+
+/**
+ * Render the custom WebSite properties field.
+ */
+function arwp_field_custom_website() {
+	arwp_textarea_field(
+		'arwp_schema_custom_website',
+		__( 'One property per line. Merged into the WebSite node.', 'arwp' ),
+		'https://schema.org/WebSite'
+	);
+}
+
+/**
+ * Render the custom content node properties field.
+ */
+function arwp_field_custom_content() {
+	arwp_textarea_field(
+		'arwp_schema_custom_content',
+		__( 'One property per line. Merged into every content node (article, page, custom post type).', 'arwp' ),
+		'https://schema.org/Thing'
+	);
+}
+
+/**
+ * Render the custom graph nodes field.
+ */
+function arwp_field_custom_graph() {
+	arwp_textarea_field(
+		'arwp_schema_custom_graph',
+		__( 'One full node per line, e.g. "event|{\'@type\': \'Event\', \'name\': \'Open House\', \'url\': \'{home}\'}". Each node is appended to the @graph.', 'arwp' ),
+		'https://schema.org/Graph'
+	);
+}
+
+/**
+ * Render the WebSite section intro paragraph.
+ */
 function arwp_website_section_cb() {
 	echo '<p>' . esc_html__( 'WebSite node identity in the @graph. Empty fields fall back to the WordPress site name.', 'arwp' ) . '</p>';
 }
 
+/**
+ * Render the website name field.
+ */
 function arwp_field_website_name() {
 	arwp_text_field(
 		'arwp_schema_website_name',
@@ -2200,6 +3102,9 @@ function arwp_field_website_name() {
 	);
 }
 
+/**
+ * Render the website alternate name field.
+ */
 function arwp_field_website_alternate_name() {
 	arwp_text_field(
 		'arwp_schema_website_alternate_name',
@@ -2210,10 +3115,16 @@ function arwp_field_website_alternate_name() {
 	);
 }
 
+/**
+ * Render the schema mappings section intro paragraph.
+ */
 function arwp_mappings_section_cb() {
 	echo '<p>' . esc_html__( 'Default schema type per content type. Override on individual items via the post editor meta box.', 'arwp' ) . '</p>';
 }
 
+/**
+ * Render the default post type schema selector.
+ */
 function arwp_field_default_post_type() {
 	arwp_select_field(
 		'arwp_schema_default_post_type',
@@ -2224,6 +3135,9 @@ function arwp_field_default_post_type() {
 	);
 }
 
+/**
+ * Render the default page type schema selector.
+ */
 function arwp_field_default_page_type() {
 	arwp_select_field(
 		'arwp_schema_default_page_type',
@@ -2234,6 +3148,9 @@ function arwp_field_default_page_type() {
 	);
 }
 
+/**
+ * Render the default custom post type schema selector.
+ */
 function arwp_field_default_other_type() {
 	arwp_select_field(
 		'arwp_schema_default_other_type',
@@ -2276,11 +3193,16 @@ function arwp_select_field( $name, $options, $current, $description = '', $learn
  */
 function arwp_jsonld_conditional_sections() {
 	return array(
-		'arwp_local_section'    => 'local_business',
-		'arwp_ngo_section'      => 'ngo',
-		'arwp_news_section'     => 'news_media',
-		'arwp_corporate_section' => 'corporation',
-		'arwp_commerce_section' => 'commerce',
+		'arwp_local_section'       => 'local_business',
+		'arwp_ngo_section'         => 'ngo',
+		'arwp_news_section'        => 'news_media',
+		'arwp_corporate_section'   => 'corporation',
+		'arwp_commerce_section'    => 'commerce',
+		'arwp_dining_section'      => 'dining',
+		'arwp_hospitality_section' => 'hospitality',
+		'arwp_medical_section'     => 'medical',
+		'arwp_education_section'   => 'education',
+		'arwp_civic_section'       => 'civic_community',
 	);
 }
 

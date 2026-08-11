@@ -3,7 +3,7 @@ Contributors: akosiraffytot
 Tags: json-ld, schema, structured data, schema.org, seo, knowledge graph
 Requires at least: 6.9
 Tested up to: 7.0.2
-Stable tag: 1.1.0
+Stable tag: 1.2.0
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -67,6 +67,13 @@ No. Output is a single small JSON-LD script in the head, built with standard Wor
 
 == Changelog ==
 
+= 1.2.0 =
+* New: multi-type Organization selector — pick several Schema.org types at once (e.g. LocalBusiness + ClothingStore); the Organization node emits `@type` as an array and shows the combined settings sections.
+* New: field clusters for food-serving, lodging, healthcare, education, and civic/community types (cuisine, reservations, menu, star rating, rooms, check-in/out times, pets, medical specialty, services, departments, alumni, affiliations, sport).
+* New: "Location & Local Information" section now also applies to schools, non-profits, news media, and corporations.
+* New: Custom JSON-LD escape hatch — add your own properties to the Organization, WebSite, or content nodes, or append whole nodes to the graph, with a `{home}` placeholder, comments, and automatic invalid-line dropping.
+* Fixed: author profile schema save now re-verifies the profile form nonce; module toggles no longer read a missing request key.
+
 = 1.1.0 =
 * New: organization type selector with 54 Schema.org subtypes (LocalBusiness, non-profit, news media, corporation, e-commerce, and store types).
 * New: Organization identity fields — legal name, slogan, tax/VAT IDs, founding date, founder, area served, and contact point (phone, email, type, languages).
@@ -100,6 +107,9 @@ No. Output is a single small JSON-LD script in the head, built with standard Wor
 * Automatic updates from GitHub (Plugin Update Checker).
 
 == Upgrade Notice ==
+
+= 1.2.0 =
+Adds multi-type Organization selection, per-niche field clusters (dining, hospitality, medical, education, civic & community), and a Custom JSON-LD escape hatch. Existing settings are preserved.
 
 = 1.1.0 =
 Adds the schema expansion: organization type selector, LocalBusiness/non-profit/news/corporate/e-commerce fields, Service schema, BreadcrumbList, third-party SEO suppression, developer filters, and Media Library logo picker.

@@ -75,8 +75,15 @@ function arwp_render_post_meta_box( $post ) {
 			<?php
 			printf(
 				wp_kses(
+					/* translators: %1$s: author display name; %2$s: user profile URL. */
 					__( 'Author details (Job Title &amp; Social Links) are pulled from %1$s&#8217;s <a href="%2$s" target="_blank" rel="noopener noreferrer">User Profile ↗</a>.', 'arwp' ),
-					array( 'a' => array( 'href' => array(), 'target' => array(), 'rel' => array() ) )
+					array(
+						'a' => array(
+							'href'   => array(),
+							'target' => array(),
+							'rel'    => array(),
+						),
+					)
 				),
 				esc_html( $author_name ),
 				esc_url( $author_link )

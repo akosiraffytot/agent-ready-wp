@@ -111,6 +111,7 @@ function arwp_field_author_schema_note() {
 	$profile_url = get_edit_profile_url();
 	echo wp_kses(
 		sprintf(
+			/* translators: %1$s: user profile URL. */
 			__( 'Author schema metadata (Job Title &amp; Social Links) is managed on your <a href="%1$s">user profile</a> (Users &gt; Profile).', 'arwp' ),
 			esc_url( $profile_url )
 		),
