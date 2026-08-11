@@ -1,5 +1,8 @@
 === Agent Ready WP Changelog ===
 
+= 1.2.1 =
+* Fixed: Organization geo latitude/longitude are now emitted as clean text values (e.g. "34.85698") instead of floats, so no long decimal precision noise appears on servers with a high serialize_precision setting. schema.org's latitude/longitude accept Text.
+
 = 1.2.0 =
 * New: multi-type Organization selector — several Schema.org subtypes can be selected at once (e.g. LocalBusiness + ClothingStore); the Organization node emits `@type` as an array and the settings sections union across all selected types.
 * New: field clusters for niche types — dining (servesCuisine, acceptsReservations, hasMenu), hospitality (starRating, numberOfRooms, checkinTime, checkoutTime, petsAllowed), medical (medicalSpecialty, availableService), education (department, alumni), civic & community (affiliation, sport).

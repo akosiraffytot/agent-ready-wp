@@ -3,7 +3,7 @@ Contributors: akosiraffytot
 Tags: json-ld, schema, structured data, schema.org, seo, knowledge graph
 Requires at least: 6.9
 Tested up to: 7.0.2
-Stable tag: 1.2.0
+Stable tag: 1.2.1
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -67,6 +67,9 @@ No. Output is a single small JSON-LD script in the head, built with standard Wor
 
 == Changelog ==
 
+= 1.2.1 =
+* Fixed: geo coordinates in the Organization node are now emitted as clean text values instead of floats, avoiding long decimal noise on servers with a high serialize_precision setting. schema.org accepts text for latitude/longitude.
+
 = 1.2.0 =
 * New: multi-type Organization selector — pick several Schema.org types at once (e.g. LocalBusiness + ClothingStore); the Organization node emits `@type` as an array and shows the combined settings sections.
 * New: field clusters for food-serving, lodging, healthcare, education, and civic/community types (cuisine, reservations, menu, star rating, rooms, check-in/out times, pets, medical specialty, services, departments, alumni, affiliations, sport).
@@ -107,6 +110,9 @@ No. Output is a single small JSON-LD script in the head, built with standard Wor
 * Automatic updates from GitHub (Plugin Update Checker).
 
 == Upgrade Notice ==
+
+= 1.2.1 =
+Fixes geo coordinate output (clean text instead of float precision noise). No settings changes.
 
 = 1.2.0 =
 Adds multi-type Organization selection, per-niche field clusters (dining, hospitality, medical, education, civic & community), and a Custom JSON-LD escape hatch. Existing settings are preserved.

@@ -154,8 +154,9 @@ WordPress plugin "Agent Ready WP". Injects `@graph` JSON-LD for AI-agent readine
     §4.10–4.14 (Dining/Hospitality/Medical/Education/Civic), §4.15–4.17
     renumbered, §4.18 Custom JSON-LD, §12. Release bookkeeping prepped in
     this repo's committed files (readme.txt, CHANGELOG.TXT, AGENTS.md,
-    header + `ARWP_VERSION` = 1.2.0); the commit/push/tag/release was
-    deferred by the user to the next session.
+    header + `ARWP_VERSION` = 1.2.0). SHIPPED as commit `3f725aa` (tag
+    `v1.2.0` + GitHub Release created by the user on the GitHub UI; PUC
+    update delivered to live sites).
 - Validate Schema (admin bar): current **1.0.2** builds the prefilled
   `validator.schema.org/?code=` link SERVER-SIDE with NO JS. The node `href` is
   left `''` so WP never runs the URL through `esc_url()` (its `clean_url` CRLF
@@ -280,18 +281,26 @@ WordPress plugin "Agent Ready WP". Injects `@graph` JSON-LD for AI-agent readine
 - `readme.txt` `Stable tag:` must always match the released code version.
 - Keep the plugin header `Description:` in sync with the readme short description (≤150 chars, no markup).
 - Push after any release commit; ask before running git commands.
-- Current released version: 1.2.0 (release bookkeeping complete; commit
-  NOT yet made — commit + push + tag `v1.2.0` + GitHub Release + PUC update
-  test).
+- Current released version: 1.2.0 (SHIPPED: commit `3f725aa`; tag `v1.2.0` +
+  GitHub Release created by the user on the GitHub UI; PUC auto-update
+  delivered to live sites — confirmed "we have the v1.2.0 on our websites").
   1.2.0 = multi-type Organization selector (pill/token multi-select, `@type`
   array + unioned conditional sections) + per-niche field clusters (dining,
   hospitality, medical, education, civic_community — 14 options) +
   "Location & Local Information" rename/coverage + Custom JSON-LD escape
   hatch (4 textareas, `name|JSON`, `{home}`, `#` comments, duplicate names →
-  arrays, invalid lines dropped with a notice) + WPCS-clean pass. Release =
-  the prepped commit bumping header + `ARWP_VERSION` + readme `Stable tag` +
-  changelog + `CHANGELOG.TXT` + AGENTS.md + docs, then tag `v1.2.0` + GitHub
-  Release.
+  arrays, invalid lines dropped with a notice) + WPCS-clean pass.
+- 1.2.1 (in progress, PREPPED — commit NOT yet made): geo fix — the
+  Organization node's `latitude`/`longitude` were cast to `(float)`, so
+  servers with a high php.ini `serialize_precision` dumped the full ~54-digit
+  IEEE754 expansion (e.g. `34.85698000000000007503331289626657962799072265625`)
+  in the JSON output. FIX: emit the sanitized string as-is
+  (module-json-ld.php, `arwp_jsonld_build_global_nodes()`, geo block) —
+  schema.org's `latitude`/`longitude` accept Text, so the output is clean on
+  any server. Release bookkeeping prepped: header + `ARWP_VERSION` 1.2.1,
+  readme `Stable tag` + changelog + upgrade notice, `CHANGELOG.TXT`, AGENTS.md,
+  TODO.MD. Commit + push + tag `v1.2.1` + GitHub Release + PUC update test
+  still pending user go-ahead.
 
 ## graphify
 

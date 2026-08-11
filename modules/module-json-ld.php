@@ -1306,8 +1306,8 @@ function arwp_jsonld_build_global_nodes( $values = array() ) {
 		if ( is_numeric( $lat ) && is_numeric( $lng ) ) {
 			$organization['geo'] = array(
 				'@type'     => 'GeoCoordinates',
-				'latitude'  => (float) $lat,
-				'longitude' => (float) $lng,
+				'latitude'  => $lat,
+				'longitude' => $lng,
 			);
 		}
 
