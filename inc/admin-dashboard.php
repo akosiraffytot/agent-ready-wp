@@ -39,7 +39,8 @@ add_action( 'admin_menu', 'arwp_register_admin_menu' );
  * @param string $hook_suffix Current admin page hook.
  */
 function arwp_admin_enqueue( $hook_suffix ) {
-	$is_plugin_page = 'toplevel_page_arwp-dashboard' === $hook_suffix || 'agent-ready-wp_page_arwp-settings' === $hook_suffix || 'agent-ready-wp_page_arwp-jsonld' === $hook_suffix;
+	$is_llms_page   = 'agent-ready-wp_page_arwp-llms' === $hook_suffix || 'arwp-dashboard_page_arwp-llms' === $hook_suffix;
+	$is_plugin_page = 'toplevel_page_arwp-dashboard' === $hook_suffix || 'agent-ready-wp_page_arwp-settings' === $hook_suffix || 'agent-ready-wp_page_arwp-jsonld' === $hook_suffix || $is_llms_page;
 	$is_post_editor = 'post.php' === $hook_suffix || 'post-new.php' === $hook_suffix;
 
 	if ( ! $is_plugin_page && ! $is_post_editor ) {
@@ -77,7 +78,7 @@ function arwp_admin_enqueue( $hook_suffix ) {
 	wp_enqueue_script(
 		'arwp-admin',
 		ARWP_URL . 'assets/arwp-admin.js',
-		array(),
+		array( 'jquery' ),
 		(string) filemtime( ARWP_PATH . 'assets/arwp-admin.js' ),
 		true
 	);
@@ -109,6 +110,25 @@ function arwp_admin_enqueue( $hook_suffix ) {
 				'ajaxUrl' => admin_url( 'admin-ajax.php' ),
 				'nonce'   => wp_create_nonce( 'arwp_preview_jsonld' ),
 				'pageUrl' => home_url( '/' ),
+			)
+		);
+	}
+
+	if ( $is_llms_page ) {
+		wp_enqueue_script(
+			'arwp-llms-preview',
+			ARWP_URL . 'assets/arwp-llms-preview.js',
+			array(),
+			(string) filemtime( ARWP_PATH . 'assets/arwp-llms-preview.js' ),
+			true
+		);
+
+		wp_localize_script(
+			'arwp-llms-preview',
+			'ArwpLlmsPreview',
+			array(
+				'ajaxUrl' => admin_url( 'admin-ajax.php' ),
+				'nonce'   => wp_create_nonce( 'arwp_preview_llms' ),
 			)
 		);
 	}

@@ -1,5 +1,19 @@
 === Agent Ready WP Changelog ===
 
+= 1.4.0 =
+* New: LLMS.TXT module — serves a virtual /llms.txt (the AI-agent content index) at the site root with no physical file and no rewrite rules.
+* New: Site Identity settings — title (H1), summary (blockquote), and free-form AI Context describing the site to agents.
+* New: Core Pages section — built from a picked navigation menu (top-level items only, depth filterable) or falling back to top-level static pages.
+* New: Recent Articles section under the conventional `## Optional` heading, with a per-site count.
+* New: opt-in sections for public custom post types, each with its own item count (default off).
+* New: Manual Content block — arbitrary Markdown appended verbatim (external links, extra sections, notes).
+* New: eligibility gating (published, public type, permalink exists, not password-protected), in-section URL dedupe + normalization, 300-character description cap, and a ~500 KB output safety net.
+* New: live /llms.txt preview (debounced, request-cancelling) with Copy, a direct View link, and structural self-checks on the settings page (invalid links, duplicate URLs, empty titles).
+* New: developer filters — agent_ready_llms_sections, agent_ready_llms_include_item, agent_ready_llms_item_description, agent_ready_llms_menu_depth, agent_ready_llms_content.
+* Improved: module submenus now appear/disappear instantly in the sidebar when a module is toggled (Rank Math dynamic-submenu pattern; JSON-LD and LLMS.TXT submenus are server-rendered only while the module is on).
+* Improved: non-technical settings copy with per-field "Learn more" links to the llmstxt.org spec, and a physical-file shadowing warning when a real root llms.txt exists.
+* Fixed: the JSON-LD live preview now reflects unchecking the acceptsReservations/petsAllowed toggles without saving first (unchecked checkboxes default to off in the preview handler).
+
 = 1.3.0 =
 * New: top-level `telephone` on the Organization node — emitted alongside the existing `contactPoint` block for Google's LocalBusiness parser compatibility.
 * New: the homepage `WebPage` node now links to the business via `about` (Organization @id), so crawlers and AI agents know the page's primary subject.

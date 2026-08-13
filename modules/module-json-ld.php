@@ -26,37 +26,6 @@ function arwp_jsonld_register_settings_menu() {
 add_action( 'admin_menu', 'arwp_jsonld_register_settings_menu' );
 
 /**
- * Hide the sidebar submenu when the module is off (prevents a flash before
- * JS shows/hides it dynamically). Uses querySelector + closest() so it works
- * in every browser, unlike a CSS :has() selector.
- */
-function arwp_jsonld_hide_menu_when_off() {
-	$active = get_option( 'arwp_schema_active_modules', arwp_get_default_modules() );
-
-	if ( empty( $active['json_ld'] ) ) {
-		?>
-		<script>
-		( function () {
-			function arwpHideJsonldMenu() {
-				var link = document.querySelector( '#adminmenu .wp-submenu a[href$="page=arwp-jsonld"]' );
-				if ( link && link.closest( 'li' ) ) {
-					link.closest( 'li' ).style.display = 'none';
-				}
-			}
-
-			if ( 'loading' === document.readyState ) {
-				document.addEventListener( 'DOMContentLoaded', arwpHideJsonldMenu );
-			} else {
-				arwpHideJsonldMenu();
-			}
-		} )();
-		</script>
-		<?php
-	}
-}
-add_action( 'admin_head', 'arwp_jsonld_hide_menu_when_off' );
-
-/**
  * Register JSON-LD settings fields.
  */
 function arwp_jsonld_register_settings() {
@@ -2263,6 +2232,14 @@ function arwp_ajax_preview_jsonld() {
 		if ( isset( $_POST[ $name ] ) ) {
 			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput -- sanitized by each field's arwp_sanitize_* callback.
 			$values[ $name ] = call_user_func( $callback, wp_unslash( $_POST[ $name ] ) );
+		}
+	}
+
+	// Unchecked checkboxes are absent from FormData; default them to off so
+	// the preview reflects toggling a field off before saving.
+	foreach ( array( 'arwp_schema_accepts_reservations', 'arwp_schema_pets_allowed' ) as $name ) {
+		if ( ! isset( $values[ $name ] ) ) {
+			$values[ $name ] = '0';
 		}
 	}
 

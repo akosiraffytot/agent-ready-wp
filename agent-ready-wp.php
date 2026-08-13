@@ -2,8 +2,8 @@
 /**
  * Plugin Name: Agent Ready WP
  * Plugin URI:  https://github.com/akosiraffytot/agent-ready-wp
- * Description: Zero-bloat JSON-LD plugin that automatically emits a full Schema.org @graph on every page for search engines and AI agents.
- * Version:     1.3.0
+ * Description: A zero-bloat AI readiness plugin that structures your WordPress content for LLMs, AI agents, and search engines. Future-proof your site, no slowdown.
+ * Version:     1.4.0
  * Author:      Rafael Mendoza
  * Author URI:  https://akosiraffytot.dev/
  * License: GPL v2 or later
@@ -15,7 +15,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'ARWP_VERSION', '1.3.0' );
+define( 'ARWP_VERSION', '1.4.0' );
 define( 'ARWP_PATH', plugin_dir_path( __FILE__ ) );
 define( 'ARWP_URL', plugin_dir_url( __FILE__ ) );
 define( 'ARWP_GITHUB_REPO', 'akosiraffytot/agent-ready-wp' );
@@ -58,13 +58,13 @@ function arwp_get_modules() {
 			'soon'           => false,
 		),
 		'llm_txt'     => array(
-			'title'          => 'llm.txt',
-			'description'    => 'Serve a machine-readable /llm.txt markdown summary.',
+			'title'          => 'LLMS.TXT',
+			'description'    => 'Publish a curated /llms.txt index of your most important content for AI agents.',
 			'icon'           => 'dashicons-media-text',
 			'active_default' => 0,
-			'has_settings'   => false,
-			'settings_slug'  => '',
-			'soon'           => true,
+			'has_settings'   => true,
+			'settings_slug'  => 'arwp-llms',
+			'soon'           => false,
 		),
 		'ai_robots'   => array(
 			'title'          => 'AI Robots',
@@ -123,10 +123,11 @@ function arwp_load_modules() {
 	$registry = arwp_get_modules();
 	$active   = get_option( 'arwp_schema_active_modules', arwp_get_default_modules() );
 
-	// json_ld always loads so its settings page stays reachable even when the
-	// module is toggled off. Front-end output gates on the active option.
+	// Modules load only when active, so each module's submenu is server-rendered
+	// only while it is on. The dashboard JS re-fetches the admin sidebar after a
+	// toggle (Rank Math pattern) so submenus appear/disappear without a reload.
 	foreach ( $registry as $id => $module ) {
-		if ( empty( $active[ $id ] ) && 'json_ld' !== $id ) {
+		if ( empty( $active[ $id ] ) ) {
 			continue;
 		}
 

@@ -13,7 +13,7 @@ WordPress plugin "Agent Ready WP". Injects `@graph` JSON-LD for AI-agent readine
 - `TODO.MD` = live status + decisions logged. `DEVELOPMENT_PLAN.md` = draft spec with known inconsistencies: the `modules/` layout wins over the checklist's stale `inc/schema-builder.php` / `inc/integrations-woo.php` paths.
 - Scope: only JSON-LD module (`modules/module-json-ld.php`) is built. llm_txt, ai_robots, woocommerce exist as disabled dashboard cards with "Soon" badge. No placeholder module files.
 - Data storage: `wp_postmeta` + `wp_options`. No custom DB tables (deliberate).
-- Menu: top-level "Agent Ready WP" + Dashboard (card grid) + Settings submenu. Module toggles = instant AJAX, not form reload.
+- Menu: top-level "Agent Ready WP" + Dashboard (card grid) + Settings submenu. Module toggles = instant AJAX, not form reload. Settings renders LAST in the submenu (its `admin_menu` hook runs at priority 20; module submenus use default 10) — module submenus fade in/out via the Rank Math swap, which is position-agnostic.
 
 ## Current state (don't assume)
 
@@ -344,6 +344,50 @@ WordPress plugin "Agent Ready WP". Injects `@graph` JSON-LD for AI-agent readine
     clean. **COMMITTED + PUSHED as `f847bce` on 2026-08-11.** Tag `v1.3.0` +
     GitHub Release + PUC update test done manually by the user on the GitHub
     UI (sequence: release 1.2.1 first, then 1.3.0).
+- 1.4.0 (WIP, working-tree only — uncommitted `agent-ready-wp.php` registry
+  edit + `modules/module-llm-txt.php`; `doc/` and `TODO.MD` are
+  gitignored local-only): the **llms.txt module** — the new 1.4.0 feature
+  track. Plan = `doc/LLMS_TXT_PLAN.MD` (v3, 10 gated phases; `TODO.MD` has
+  the phase checkboxes). Phases 1–5 COMPLETE (all user-confirmed):
+  Phase 1 (card + skeleton + default serve), Phase 2 (Site Identity
+  settings), Phase 3 (Core Pages section — menu picker + static-pages
+  fallback), Phase 4 (Recent Articles under `## Optional`), Phase 5 (opt-in
+  CPT sections). Registry key stays `llm_txt` (seeded-option compat), card
+  title + sidebar submenu label = **LLMS.TXT** (display only; endpoint stays
+  lowercase `/llms.txt` per llmstxt.org), `settings_slug` = `arwp-llms`,
+  `soon` = false, `has_settings` = true. The module serves `# <site name>` +
+  `> <tagline>` on `template_redirect` when `$wp->request === 'llms.txt'`
+  (404-if-empty, module-active gate). Phase 5 session note (2026-08-12): the
+  settings half (dynamic per-CPT fields, `register_setting` loop, `:has()`
+  row-hiding) pre-existed, but the builder half was MISSING — the file called
+  `arwp_llms_public_cpt_slugs()` at three sites without ever defining it, and
+  `arwp_llms_build_sections()` returned only Core Pages + Recent Articles.
+  Added `arwp_llms_public_cpt_slugs()` (public types minus
+  post/page/attachment), `arwp_llms_cpt_sections()` (one section per enabled
+  CPT, title from type label, appended via `array_merge`),
+  `arwp_llms_cpt_items()` (bounded `get_posts`, cap clamped 0–100). Next
+  session: Phase 6 (manual block), then Phase 7 (eligibility + dedupe +
+  limits), Phase 8 (live preview + diagnostics), Phase 9 (dev filters +
+  hardening), Phase 10 (release 1.4.0).
+- 1.4.0 (SHIPPED — tag `v1.4.0` + GitHub Release created by the user on the
+  GitHub UI; PUC update delivered to live sites): the **llms.txt module**.
+  All 10 phases complete (user-confirmed). Module file `modules/module-llm-txt.php`:
+  card + default serve (`template_redirect`, `$wp->request === 'llms.txt'`,
+  404-if-empty, module-active + is_admin/REST/feed guards), Site Identity
+  (title/summary/intro), Core Pages (menu picker with depth filter + static-pages
+  fallback), Recent Articles under `## Optional`, opt-in CPT sections (dynamic
+  fields, default off), Manual Content block (verbatim), eligibility
+  (`arwp_llms_is_eligible_post`), dedupe (`arwp_llms_normalize_url` +
+  `arwp_llms_dedupe_items`), limits (300-char desc, ~500 KB guard), live preview
+  (`arwp_ajax_preview_llms` + `assets/arwp-llms-preview.js`, debounced +
+  AbortController, unchecked-checkbox '0' defaults), View link + structural
+  self-checks on the settings page, dev filters
+  (`agent_ready_llms_sections`/`_include_item`/`_item_description`/
+  `_menu_depth`/`_content`), non-technical UI copy with per-field Learn more
+  links (llmstxt.org/#format and #example). 1.4.0 also shipped the Rank Math
+  dynamic-submenu refactor (loader loads modules only when active;
+  `refreshArwpSubmenu()` in arwp-admin.js) and the JSON-LD preview parity fix
+  (unchecked toggle defaults). Release commit hash: TBD (record after commit).
 
 ## graphify
 

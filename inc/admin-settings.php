@@ -20,7 +20,7 @@ function arwp_register_settings_menu() {
 		'arwp_render_settings'
 	);
 }
-add_action( 'admin_menu', 'arwp_register_settings_menu' );
+add_action( 'admin_menu', 'arwp_register_settings_menu', 20 );
 
 /**
  * Register global plugin settings.

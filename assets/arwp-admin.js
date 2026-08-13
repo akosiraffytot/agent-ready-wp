@@ -1,18 +1,20 @@
 /**
  * Agent Ready WP — admin toggle handling.
  */
-function syncArwpSubmenu( input ) {
-	var slug = input.getAttribute( 'data-settings-slug' );
+function refreshArwpSubmenu() {
+	jQuery.ajax( {
+		url: window.location.pathname + window.location.search,
+		method: 'GET'
+	} ).done( function ( html ) {
+		var fresh = jQuery( html ).find( '#toplevel_page_arwp-dashboard' );
+		var current = jQuery( '#toplevel_page_arwp-dashboard > .wp-submenu' );
 
-	if ( ! slug ) {
-		return;
-	}
-
-	var link = document.querySelector( '#adminmenu .wp-submenu a[href$="page=' + slug + '"]' );
-
-	if ( link && link.closest( 'li' ) ) {
-		link.closest( 'li' ).style.display = input.checked ? '' : 'none';
-	}
+		if ( fresh.length && fresh.find( '> .wp-submenu > li' ).length !== current.children( 'li' ).length ) {
+			current.fadeOut( 200, function () {
+				current.html( fresh.find( '> .wp-submenu' ).hide().children() ).fadeIn( 400 );
+			} );
+		}
+	} );
 }
 
 function syncArwpCard( input ) {
@@ -47,7 +49,7 @@ document.querySelectorAll( '.arwp-toggle' ).forEach( function ( input ) {
 			.then( function ( result ) {
 				if ( result.success ) {
 					syncArwpCard( self );
-					syncArwpSubmenu( self );
+					refreshArwpSubmenu();
 				} else {
 					self.checked = ! self.checked;
 				}
@@ -60,7 +62,6 @@ document.querySelectorAll( '.arwp-toggle' ).forEach( function ( input ) {
 	} );
 
 	syncArwpCard( input );
-	syncArwpSubmenu( input );
 } );
 
 /**

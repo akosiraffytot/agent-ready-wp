@@ -3,12 +3,12 @@ Contributors: akosiraffytot
 Tags: json-ld, schema, structured data, schema.org, seo, knowledge graph
 Requires at least: 6.9
 Tested up to: 7.0.2
-Stable tag: 1.3.0
+Stable tag: 1.4.0
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Zero-bloat JSON-LD plugin that automatically emits a full Schema.org @graph on every page for search engines and AI agents.
+A zero-bloat AI readiness plugin that structures your WordPress content for LLMs, AI agents, and search engines. Future-proof your site, no slowdown.
 
 == Description ==
 
@@ -34,7 +34,8 @@ Activate the plugin and a complete `@graph` is generated automatically on every 
 
 = AI-ready roadmap =
 * **JSON-LD** — active by default
-* **llm_txt, AI robots, WooCommerce** — coming soon (module cards on the dashboard)
+* **llms.txt** — available since 1.4.0
+* **AI robots, WooCommerce** — coming soon (module cards on the dashboard)
 
 No dependencies, theme-agnostic, translation-ready.
 
@@ -66,6 +67,13 @@ Use the admin bar "Validate Schema" menu — its main item opens validator.schem
 No. Output is a single small JSON-LD script in the head, built with standard WordPress functions and no external requests.
 
 == Changelog ==
+
+= 1.4.0 =
+* New: LLMS.TXT module — a virtual /llms.txt file served for AI agents, with its own settings page: site identity (title, summary, AI context), a Core Pages section built from your menu, recent articles under the conventional "Optional" heading, opt-in custom post type sections, and a manual content block.
+* New: live /llms.txt preview with Copy, a direct View link, and on-page structural checks (invalid links, duplicate URLs, empty titles).
+* New: developer filters for llms.txt sections, items, descriptions, menu depth, and final content.
+* Improved: module submenus now appear and disappear instantly in the sidebar when a module is toggled.
+* Fixed: the JSON-LD live preview now reflects unchecking the reservation/pets toggles without saving first.
 
 = 1.3.0 =
 * New: the Organization node now emits a top-level telephone (the contactPoint block is kept alongside it).
@@ -117,6 +125,9 @@ No. Output is a single small JSON-LD script in the head, built with standard Wor
 * Automatic updates from GitHub (Plugin Update Checker).
 
 == Upgrade Notice ==
+
+= 1.4.0 =
+Adds the LLMS.TXT module — a virtual /llms.txt file with site identity, core pages from your menu, recent articles, opt-in content type sections, and a manual content block — plus a live preview. JSON-LD behavior is unchanged and existing settings are preserved.
 
 = 1.3.0 =
 Adds a top-level telephone, a homepage about link to the business, a global Organization Image (with per-page fallback to featured/custom images), and slimmer knowsAbout output. Existing settings are preserved.
