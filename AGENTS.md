@@ -387,7 +387,8 @@ WordPress plugin "Agent Ready WP". Injects `@graph` JSON-LD for AI-agent readine
   links (llmstxt.org/#format and #example). 1.4.0 also shipped the Rank Math
   dynamic-submenu refactor (loader loads modules only when active;
   `refreshArwpSubmenu()` in arwp-admin.js) and the JSON-LD preview parity fix
-  (unchecked toggle defaults). Release commit hash: TBD (record after commit).
+  (unchecked toggle defaults). Release commit hash: `cb67826` (committed +
+  pushed 2026-08-13).
 
 ## graphify
 
